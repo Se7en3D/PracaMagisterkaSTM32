@@ -18,6 +18,37 @@
 #define SERVO360_PERIOD_ROTATION_RIGHT 4200 //wypełnienie podczas obrotu w lewo
 #define SERVO360_PERIOD_ROTATION_LEFT 3000 // wpełnienie podczas obrotu w prawo
 #define SERVO360_REPEAT_ROTATION 8 //powtórzenie podczas oboru
+
+volatile static uint8_t servo360RepeatAngle[]={
+		9,
+		14,
+		18,
+		24,
+		26,
+		32,
+		36,
+		39,
+		43,
+		48,
+		52,
+		56,
+};
+
+typedef enum{
+	servo360_15Angle=0,
+	servo360_30Angle,
+	servo360_45Angle,
+	servo360_60Angle,
+	servo360_75Angle,
+	servo360_90Angle,
+	servo360_105Angle,
+	servo360_120Angle,
+	servo360_135Angle,
+	servo360_150Angle,
+	servo360_165Angle,
+	servo360_180Angle,
+}servo360_angle;
+
 typedef enum{
 	servo360_INITIALIZATION=0,
 	servo360_IDLE,

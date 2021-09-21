@@ -4,7 +4,7 @@
  *  Created on: 6 sie 2021
  *      Author: DanielD
  */
-
+#include <stdlib.h>
 #include "stm32h7xx_hal.h"
 #include "errorCode.h"
 #include "servo360.h"
@@ -35,6 +35,7 @@ void servo360PWMEdit(){
 
 	if(servo360Structure.repeatValue<1 ){
 		if(servo360Structure.period==SERVO360_DEFAULT_PERIOD){
+			//servo360Structure.repeatValue=0;
 			return;
 		}
 		servo360Structure.period=SERVO360_DEFAULT_PERIOD;
@@ -84,10 +85,13 @@ void servo360StatusInitialization(){
 		GPIO_PinState limitSwitchServoPinStatus=HAL_GPIO_ReadPin(servo360Structure.limitSwitchServoPort, servo360Structure.limitSwitchServoPin);
 		if(limitSwitchServoPinStatus==GPIO_PIN_RESET){
 			servo360Structure.status=servo360_IDLE;
-			servo360Structure.period=4200;
+			servo360PWMDefault();
+			servo360SetCurrentPositionByPositionNumber(0);
+			servo360SetTargetPosition(0);
+			/*servo360Structure.period=4200;
 			servo360Structure.repeatValue=36;
 			servo360SetCurrentPositionByPositionNumber(SERVO360_MAX_POSITION/2);
-			servo360SetTargetPosition(SERVO360_MAX_POSITION/2);
+			servo360SetTargetPosition(SERVO360_MAX_POSITION/2);*/
 		}else{
 			if(servo360Structure.repeatValue<1){
 				servo360Structure.period=SERVO360_PERIOD_INITIALIZATION;
@@ -108,7 +112,18 @@ void servo360StatusIdle(){
 }
 void servo360StatusRotate(){
 	if(servo360Structure.status==servo360_ROTATE ){
-		if(servo360Structure.targetPosition!=servo360Structure.currentPosition){
+		if(servo360Structure.targetPosition!=servo360Structure.currentPosition ){
+			if(servo360Structure.repeatValue<=0){
+				uint32_t difference=abs(servo360Structure.targetPosition-servo360Structure.currentPosition)-1;
+				if(servo360Structure.targetPosition>servo360Structure.currentPosition){
+					servo360Structure.period=SERVO360_PERIOD_ROTATION_RIGHT;
+				}else{
+					servo360Structure.period=SERVO360_PERIOD_ROTATION_LEFT;
+				}
+				servo360Structure.currentPosition=servo360Structure.targetPosition;
+				servo360Structure.repeatValue=servo360RepeatAngle[difference];
+			}
+			/*
 			if(servo360Structure.repeatValue<=0){
 				if(servo360Structure.targetPosition>servo360Structure.currentPosition){
 					servo360Structure.period=SERVO360_PERIOD_ROTATION_RIGHT;
@@ -122,7 +137,7 @@ void servo360StatusRotate(){
 				}else{
 					servo360Structure.repeatValue=SERVO360_REPEAT_ROTATION;
 				}
-			}
+			}*/
 		}else{
 			servo360Structure.status=servo360_IDLE;
 		}
