@@ -9,7 +9,7 @@
 #define INC_SERVO360_H_
 
 #define SERVO360_DEFAULT_PERIOD 3600 //Domyśle wypełnienie PWM
-#define SERVO360_STATE_SIZE 5	//Ilość statusów znajdujących się w servo360
+#define SERVO360_STATE_SIZE 6	//Ilość statusów znajdujących się w servo360
 #define SERVO360_MAX_POSITION 13 //maksymalna ilość pozycji
 #define SERVO360_MAX_ANGLE 180 //maksymalny kąt poruszania się serwomechanizmu
 #define SERVO360_PERIOD_INITIALIZATION 3000 //wypełnienie PWM podczas inicjalizacji
@@ -18,41 +18,44 @@
 #define SERVO360_PERIOD_ROTATION_RIGHT 4200 //wypełnienie podczas obrotu w lewo
 #define SERVO360_PERIOD_ROTATION_LEFT 3000 // wpełnienie podczas obrotu w prawo
 #define SERVO360_REPEAT_ROTATION 8 //powtórzenie podczas oboru
+#define SERVO360_DELAY_TO_CHANGE_PERIOD 3 //opóznienie ustawienia nowego wypełnienia
 
 volatile static uint8_t servo360RepeatAngle[]={
-		9,
-		14,
-		18,
-		24,
-		26,
-		32,
-		36,
-		39,
-		43,
-		48,
-		52,
-		56,
+		9, //Powtórzenie dla obrotu o 15 stopni
+		14,//Powtórzenie dla obrotu o 30 stopni
+		17,//Powtórzenie dla obrotu o 45 stopni
+		24,//Powtórzenie dla obrotu o 60 stopni
+		26,//Powtórzenie dla obrotu o 75 stopni
+		33,//Powtórzenie dla obrotu o 90 stopni
+		36,//Powtórzenie dla obrotu o 105 stopni
+		39,//Powtórzenie dla obrotu o 120 stopni
+		43,//Powtórzenie dla obrotu o 135 stopni
+		48,//Powtórzenie dla obrotu o 150 stopni
+		52,//Powtórzenie dla obrotu o 165 stopni
+		55,//Powtórzenie dla obrotu o 180 stopni
 };
 
 typedef enum{
-	servo360_15Angle=0,
-	servo360_30Angle,
-	servo360_45Angle,
-	servo360_60Angle,
-	servo360_75Angle,
-	servo360_90Angle,
-	servo360_105Angle,
-	servo360_120Angle,
-	servo360_135Angle,
-	servo360_150Angle,
-	servo360_165Angle,
-	servo360_180Angle,
-}servo360_angle;
+	servo360_Position0=0,
+	servo360_Position1,
+	servo360_Position2,
+	servo360_Position3,
+	servo360_Position4,
+	servo360_Position5,
+	servo360_Position6,
+	servo360_Position7,
+	servo360_Position8,
+	servo360_Position9,
+	servo360_Position10,
+	servo360_Position11,
+	servo360_Position12
+}servo360_Position;
 
 typedef enum{
 	servo360_INITIALIZATION=0,
 	servo360_IDLE,
 	servo360_ROTATE,
+	servo360_WAIT_TO_STABILIZE_SERVO,
 	servo360_WAIT_TO_MEASURMENT,
 	servo360_ERROR_INITIALIZATION,
 }servo360_state;
@@ -67,6 +70,7 @@ typedef struct{
 	uint16_t limitSwitchServoPin;
 	int currentPosition;
 	GPIO_TypeDef *limitSwitchServoPort;
+	uint8_t delayToChangePeriod;
 	 void (*stateFunction[SERVO360_STATE_SIZE])(void);
 }servo360_Base_Structure;
 
@@ -81,7 +85,7 @@ void servo360StatusWaitToMeasurment();
 void servo360PWMDefault();
 void servo360StateFunctions();
 void servo360SetCurrentPositionByPositionNumber(uint16_t number);
-void servo360SetTargetPosition(uint16_t position);
+void servo360SetTargetPosition(servo360_Position position);
 void servo360NextPosition();
 void servo360PrevPosition();
 #endif /* INC_SERVO360_H_ */

@@ -38,7 +38,7 @@ void stateMachineDrivingForward(){
 }
 void stateMachineDrivingLeft(){
 	stateMachineInitNewState();
-	drivingStructure.drivingStatus=GO_LEFT;
+	drivingStructure.drivingStatus=GO_UP_LEFT;
 	if(drivingStructure.previousDrivingStatus==drivingStructure.drivingStatus)
 		return;
 
@@ -47,7 +47,7 @@ void stateMachineDrivingLeft(){
 }
 void stateMachineDrivingRight(){
 	stateMachineInitNewState();
-	drivingStructure.drivingStatus=GO_RIGHT;
+	drivingStructure.drivingStatus=GO_UP_RIGHT;
 	if(drivingStructure.previousDrivingStatus==drivingStructure.drivingStatus)
 		return;
 

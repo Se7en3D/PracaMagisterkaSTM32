@@ -255,27 +255,34 @@ Error_Handler();
 		  switch(framepointer[FUNCTIONPOSITION]){
 		  case RIDE_FORWARD_FUN:
 			  stateMachineDrivingForward();
+			  servo360SetTargetPosition(servo360_Position6);
 			  break;
 		  case RIDE_BACKWARD_FUN:
 			  stateMachineDrivingBack();
+			  servo360SetTargetPosition(servo360_Position6);
 			  break;
 		  case RIDE_RIGHT_FUN:
 			  stateMachineDrivingRight();
+			  servo360SetTargetPosition(servo360_Position3);
 			  break;
 		  case RIDE_LEFT_FUN:
 			  stateMachineDrivingLeft();
+			  servo360SetTargetPosition(servo360_Position9);
 			  break;
 		  case ROTATE_LEFT:
 			  stateMachineRotateLeft();
+			  servo360SetTargetPosition(servo360_Position12);
 			  break;
 		  case ROTATE_RIGHT:
 			  stateMachineRotateRight();
+			  servo360SetTargetPosition(servo360_Position0);
 			  break;
 		  case STOP_FUN:
 			  stateMachineStopDriving();
+			  servo360SetTargetPosition(servo360_Position6);
 			  break;
 		  case MEASURE_DISTANCE_FUN:
-			  stateMachineMeasureDistance();
+			  stateMachineMeasureDistance(servo360_Position6);
 			  break;
 		  case CALIBRATION_PWM_DATA:
 			  servo360NewDataPWM(framepointer);
