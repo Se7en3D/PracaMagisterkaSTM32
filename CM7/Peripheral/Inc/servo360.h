@@ -8,6 +8,7 @@
 #ifndef INC_SERVO360_H_
 #define INC_SERVO360_H_
 
+
 #define SERVO360_DEFAULT_PERIOD 3600 //Domyśle wypełnienie PWM
 #define SERVO360_STATE_SIZE 6	//Ilość statusów znajdujących się w servo360
 #define SERVO360_MAX_POSITION 13 //maksymalna ilość pozycji
