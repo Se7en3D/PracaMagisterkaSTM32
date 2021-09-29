@@ -33,6 +33,7 @@
 #include "irSensor.h"
 #include "adc.h"
 #include "servo360.h"
+#include "connectionModule.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -255,31 +256,24 @@ Error_Handler();
 		  switch(framepointer[FUNCTIONPOSITION]){
 		  case RIDE_FORWARD_FUN:
 			  stateMachineDrivingForward();
-			  servo360SetTargetPosition(servo360_Position6);
 			  break;
 		  case RIDE_BACKWARD_FUN:
 			  stateMachineDrivingBack();
-			  servo360SetTargetPosition(servo360_Position6);
 			  break;
 		  case RIDE_RIGHT_FUN:
 			  stateMachineDrivingRight();
-			  servo360SetTargetPosition(servo360_Position3);
 			  break;
 		  case RIDE_LEFT_FUN:
 			  stateMachineDrivingLeft();
-			  servo360SetTargetPosition(servo360_Position9);
 			  break;
 		  case ROTATE_LEFT:
 			  stateMachineRotateLeft();
-			  servo360SetTargetPosition(servo360_Position12);
 			  break;
 		  case ROTATE_RIGHT:
 			  stateMachineRotateRight();
-			  servo360SetTargetPosition(servo360_Position0);
 			  break;
 		  case STOP_FUN:
 			  stateMachineStopDriving();
-			  servo360SetTargetPosition(servo360_Position6);
 			  break;
 		  case MEASURE_DISTANCE_FUN:
 			  stateMachineMeasureDistance(servo360_Position6);
@@ -296,6 +290,7 @@ Error_Handler();
 		  }
 		  uartComClearFrame();
 	  }
+	  connectionModuleStateMachineWithServo360(drivingStructure.drivingStatus);
 	  //driving_status_t drivingStatusTemp=stateMachineGetDrivingStructure().drivingStatus;
 	  if(drivingStructure.drivingStatus!=IDLE_DRIVING){
 		  if(drivingStructure.drivingStatus!=STOP_DRIVING){ //Pomiar pracy podczas jazdy
@@ -384,14 +379,14 @@ Error_Handler();
 		  uartComSendIrSensorStatus(irSensorGetAllCollision(),MAX_SENSOR_IR);
 		  irSensorClearTime();
 	  }
-	  if(servo360Structure.status==servo360_IDLE){
+	  //if(servo360Structure.status==servo360_IDLE){
 		  //servo360SetTargetPosition(position);
 		//  servo360SetCurrentPositionByPositionNumber(currentPosition);
 		//  currentPosition++;
 		//  if(currentPosition>SERVO360_MAX_POSITION){
 		//	  currentPosition=0;
 		//  }
-	  }
+	  //}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

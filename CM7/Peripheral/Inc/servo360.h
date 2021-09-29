@@ -17,14 +17,14 @@
 #define SERVO360_REPEAT_INITIALIZATION 3	//powtórzenie wypełnienia do kolejnego sprawdzenia
 #define SERVO360_MAX_REPEAT_TO_ERROR_IN_INITIALIZATION 20 //powtórzenia sekwencji inicjalizującej po której ma nastapić błąd
 #define SERVO360_PERIOD_ROTATION_RIGHT 4200 //wypełnienie podczas obrotu w lewo
-#define SERVO360_PERIOD_ROTATION_LEFT 3000 // wpełnienie podczas obrotu w prawo
+#define SERVO360_PERIOD_ROTATION_LEFT 3012 // wpełnienie podczas obrotu w prawo
 #define SERVO360_REPEAT_ROTATION 8 //powtórzenie podczas oboru
 #define SERVO360_DELAY_TO_CHANGE_PERIOD 3 //opóznienie ustawienia nowego wypełnienia
 
 volatile static uint8_t servo360RepeatAngle[]={
 		9, //Powtórzenie dla obrotu o 15 stopni
 		14,//Powtórzenie dla obrotu o 30 stopni
-		17,//Powtórzenie dla obrotu o 45 stopni
+		18,//Powtórzenie dla obrotu o 45 stopni
 		24,//Powtórzenie dla obrotu o 60 stopni
 		26,//Powtórzenie dla obrotu o 75 stopni
 		33,//Powtórzenie dla obrotu o 90 stopni
@@ -35,9 +35,9 @@ volatile static uint8_t servo360RepeatAngle[]={
 		52,//Powtórzenie dla obrotu o 165 stopni
 		55,//Powtórzenie dla obrotu o 180 stopni
 };
-
 typedef enum{
-	servo360_Position0=0,
+	servo360_PositionNone=-1,
+	servo360_Position0,
 	servo360_Position1,
 	servo360_Position2,
 	servo360_Position3,

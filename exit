@@ -1,0 +1,23 @@
+[33mcommit a44bdc81d23f45009266681fe81857ce5baab061[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Se7en3D <Ek"GZag8>
+Date:   Sun Sep 26 11:02:12 2021 +0200
+
+    Dodanie pliku do połączenie modulu statemachine z servo360. Usuniecie include w pliku servo360.h
+
+[33mcommit 3f807e73ce5f300ab3df814febe12b7cdc72a97f[m
+Author: Se7en3D <Ek"GZag8>
+Date:   Sat Sep 25 13:16:38 2021 +0200
+
+    Poprawienie plików stateMachine.c oraz stateMachine.h. w plikach servo360.h oraz servo260.c dodano wypełnenia wzgledem ruchu oraz doswiadczalnie sprawdzano poprawność poruszania się pomiędzy pozycjami
+
+[33mcommit 85a6646f6541b6058a992e32d482ef2b5f61485c[m
+Author: Se7en3D <Ek"GZag8>
+Date:   Tue Sep 21 20:46:52 2021 +0200
+
+    Dodanie kątów do przemieszczania się w pliku servo360.h. edycja funkcji servo360StatusRotate() w celu odpowiedniej zmiany kąta
+
+[33mcommit d7aa4ba17b959a686f7069a9909ea2708e66338e[m
+Author: Se7en3D <77826670+Se7en3D@users.noreply.github.com>
+Date:   Wed Sep 15 08:32:09 2021 +0200
+
+    Gotowa wersja oprogramowania 00

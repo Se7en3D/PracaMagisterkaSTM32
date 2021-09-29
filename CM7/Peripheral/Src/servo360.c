@@ -8,6 +8,8 @@
 #include "stm32h7xx_hal.h"
 #include "errorCode.h"
 #include "servo360.h"
+#include <stdio.h>
+
 
 void servo360Init(TIM_HandleTypeDef *htim,uint16_t pin ,GPIO_TypeDef *port){
 	servo360Structure.htim=htim;
@@ -48,6 +50,7 @@ void servo360PWMEdit(){
 		servo360Structure.repeatValue--;
 	}else{
 		servo360Structure.delayToChangePeriod--;
+		//servo360PWMDefault();
 	}
 
 }
@@ -90,6 +93,7 @@ void servo360StatusInitialization(){
 			servo360Structure.status=servo360_IDLE;
 			servo360PWMDefault();
 			servo360SetCurrentPositionByPositionNumber(0);
+			servo360SetTargetPosition(0);
 			//servo360SetTargetPosition(servo360_Position6);
 		}else{
 			if(servo360Structure.repeatValue<1){
@@ -107,6 +111,15 @@ void servo360StatusInitialization(){
 void servo360StatusIdle(){
 	if(servo360Structure.targetPosition!=servo360Structure.currentPosition && servo360Structure.status==servo360_IDLE ){
 		servo360Structure.status=servo360_ROTATE;
+		uint32_t difference=abs(servo360Structure.targetPosition-servo360Structure.currentPosition)-1;
+		if(servo360Structure.targetPosition>servo360Structure.currentPosition){
+			servo360Structure.period=SERVO360_PERIOD_ROTATION_RIGHT;
+		}else{
+			servo360Structure.period=SERVO360_PERIOD_ROTATION_LEFT;
+		}
+		servo360Structure.repeatValue=servo360RepeatAngle[difference];
+		printf("cur=%d targ=%d period=%d \n",(int)servo360Structure.currentPosition,(int )servo360Structure.targetPosition,(int)servo360Structure.repeatValue);
+		servo360Structure.currentPosition=servo360Structure.targetPosition;
 	}
 	if(servo360Structure.currentPosition==servo360_Position0){
 
@@ -123,7 +136,10 @@ void servo360StatusIdle(){
 }
 void servo360StatusRotate(){
 	if(servo360Structure.status==servo360_ROTATE ){
-		if(servo360Structure.targetPosition!=servo360Structure.currentPosition ){
+		if(servo360Structure.repeatValue<=0 && servo360Structure.period==SERVO360_DEFAULT_PERIOD){
+			servo360Structure.status=servo360_IDLE;
+		}
+		/*if(servo360Structure.targetPosition!=servo360Structure.currentPosition ){
 			if(servo360Structure.repeatValue<=0){
 				uint32_t difference=abs(servo360Structure.targetPosition-servo360Structure.currentPosition)-1;
 				if(servo360Structure.targetPosition>servo360Structure.currentPosition){
@@ -132,11 +148,15 @@ void servo360StatusRotate(){
 					servo360Structure.period=SERVO360_PERIOD_ROTATION_LEFT;
 				}
 				servo360Structure.currentPosition=servo360Structure.targetPosition;
+				printf("zmana\n");
 				servo360Structure.repeatValue=servo360RepeatAngle[difference];
+				//printf("cur=%d period=%d \n",(int)servo360Structure.currentPosition,(int)servo360Structure.repeatValue);
 			}
 		}else{
-			servo360Structure.status=servo360_IDLE;
-		}
+			if(servo360Structure.repeatValue<=0){
+				servo360Structure.status=servo360_IDLE;
+			}
+		}*/
 	}
 }
 void servo360StatusWaitToMeasurment(){
@@ -157,7 +177,7 @@ void servo360SetCurrentPositionByPositionNumber(uint16_t number){
 }
 
 void servo360SetTargetPosition(servo360_Position position){
-	if(servo360Structure.repeatValue!=0){
+	if(servo360Structure.repeatValue!=0 || servo360Structure.delayToChangePeriod!=0){
 		return;
 	}
 
