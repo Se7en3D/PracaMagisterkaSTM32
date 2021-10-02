@@ -111,24 +111,6 @@ void servo360StatusInitialization(){
 void servo360StatusIdle(){
 	if(servo360Structure.targetPosition!=servo360Structure.currentPosition && servo360Structure.status==servo360_IDLE ){
 		servo360Structure.status=servo360_ROTATE;
-		uint32_t difference=abs(servo360Structure.targetPosition-servo360Structure.currentPosition)-1;
-		if(servo360Structure.targetPosition>servo360Structure.currentPosition){
-			servo360Structure.period=SERVO360_PERIOD_ROTATION_RIGHT;
-		}else{
-			servo360Structure.period=SERVO360_PERIOD_ROTATION_LEFT;
-		}
-		servo360Structure.repeatValue=servo360RepeatAngle[difference];
-		printf("cur=%d targ=%d period=%d \n",(int)servo360Structure.currentPosition,(int )servo360Structure.targetPosition,(int)servo360Structure.repeatValue);
-		servo360Structure.currentPosition=servo360Structure.targetPosition;
-	}
-	if(servo360Structure.currentPosition==servo360_Position0){
-
-
-		GPIO_PinState pinStatus=HAL_GPIO_ReadPin(servo360Structure.limitSwitchServoPort, servo360Structure.limitSwitchServoPin);
-		if(pinStatus==GPIO_PIN_SET){
-			servo360Structure.status=servo360_INITIALIZATION;
-			return;
-		}
 	}
 	if(servo360Structure.targetPosition==servo360Structure.currentPosition){
 		//Zmiana statusu na WAIT_TO_MEASURMENT
@@ -136,27 +118,42 @@ void servo360StatusIdle(){
 }
 void servo360StatusRotate(){
 	if(servo360Structure.status==servo360_ROTATE ){
-		if(servo360Structure.repeatValue<=0 && servo360Structure.period==SERVO360_DEFAULT_PERIOD){
-			servo360Structure.status=servo360_IDLE;
-		}
-		/*if(servo360Structure.targetPosition!=servo360Structure.currentPosition ){
-			if(servo360Structure.repeatValue<=0){
-				uint32_t difference=abs(servo360Structure.targetPosition-servo360Structure.currentPosition)-1;
+		if(servo360Structure.currentPosition!=servo360Structure.targetPosition){
+			if(servo360Structure.period==SERVO360_DEFAULT_PERIOD &&
+					servo360Structure.repeatValue==0){
+				if(servo360Structure.targetPosition==servo360_Position0){
+						GPIO_PinState pinStatus=HAL_GPIO_ReadPin(servo360Structure.limitSwitchServoPort, servo360Structure.limitSwitchServoPin);
+						if(pinStatus==GPIO_PIN_RESET){
+							servo360Structure.currentPosition=0;
+							return;
+						}
+					}
+
 				if(servo360Structure.targetPosition>servo360Structure.currentPosition){
 					servo360Structure.period=SERVO360_PERIOD_ROTATION_RIGHT;
+					servo360Structure.currentPosition++;
 				}else{
 					servo360Structure.period=SERVO360_PERIOD_ROTATION_LEFT;
+					servo360Structure.currentPosition--;
 				}
-				servo360Structure.currentPosition=servo360Structure.targetPosition;
-				printf("zmana\n");
-				servo360Structure.repeatValue=servo360RepeatAngle[difference];
-				//printf("cur=%d period=%d \n",(int)servo360Structure.currentPosition,(int)servo360Structure.repeatValue);
+				servo360Structure.repeatValue=9;
+				servo360Structure.delayToChangePeriod=SERVO360_DELAY_TO_CHANGE_PERIOD;
+				//printf("cur=%d targ=%d period=%d \n",(int)servo360Structure.currentPosition,(int )servo360Structure.targetPosition,(int)servo360Structure.repeatValue);
 			}
 		}else{
-			if(servo360Structure.repeatValue<=0){
-				servo360Structure.status=servo360_IDLE;
+			if(servo360Structure.period==SERVO360_DEFAULT_PERIOD){
+				if(servo360Structure.currentPosition==servo360_Position0){
+						GPIO_PinState pinStatus=HAL_GPIO_ReadPin(servo360Structure.limitSwitchServoPort, servo360Structure.limitSwitchServoPin);
+						if(pinStatus==GPIO_PIN_SET){
+							servo360Structure.period=SERVO360_PERIOD_INITIALIZATION;
+							servo360Structure.repeatValue=SERVO360_REPEAT_INITIALIZATION;
+							return;
+						}
+					}
+				servo360Structure.status=servo360_WAIT_TO_MEASURMENT;
 			}
-		}*/
+		}
+
 	}
 }
 void servo360StatusWaitToMeasurment(){
@@ -184,9 +181,16 @@ void servo360SetTargetPosition(servo360_Position position){
 	if(position>SERVO360_MAX_POSITION){
 		errorCodePush(SERVO360_NO_NUMBER_IN_ARRAY);
 	}else{
-		if(position!=servo360Structure.targetPosition){
+		if(position!=servo360Structure.targetPosition && servo360Structure.period==SERVO360_DEFAULT_PERIOD &&
+				servo360Structure.repeatValue==0){
 			servo360Structure.targetPosition=position;
 			servo360Structure.delayToChangePeriod=SERVO360_DELAY_TO_CHANGE_PERIOD;
 		}
+	}
+}
+
+void servo36GoToIdleFromMeasurment(){
+	if(servo360Structure.status==servo360_WAIT_TO_MEASURMENT){
+		servo360Structure.status=servo360_IDLE;
 	}
 }

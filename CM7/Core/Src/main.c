@@ -291,8 +291,10 @@ Error_Handler();
 		  uartComClearFrame();
 	  }
 	  connectionModuleStateMachineWithServo360(drivingStructure.drivingStatus);
+	  connectionModuleMeasureDistance(&servo360Structure,&measurmentStructure);
+
 	  //driving_status_t drivingStatusTemp=stateMachineGetDrivingStructure().drivingStatus;
-	  if(drivingStructure.drivingStatus!=IDLE_DRIVING){
+	  /*if(drivingStructure.drivingStatus!=IDLE_DRIVING){
 		  if(drivingStructure.drivingStatus!=STOP_DRIVING){ //Pomiar pracy podczas jazdy
 			  //if(uartComSensorFrame.waitForData){
 				  float distanceUltra=hcsr04GetCelculatedValue();
@@ -320,7 +322,7 @@ Error_Handler();
 			  }
 		  }
 
-	  }
+	  }*/
 	  	 //Reset licznika od powtórzenia polecenia kierunku jazdy
 	  if(stateMachineGetResetTimer()){
 		  stateMachineResetTimer();

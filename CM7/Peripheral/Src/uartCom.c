@@ -248,7 +248,7 @@ void uartComPush(const uint8_t data){
 	}
 	int next;
 	next = uartComBuffer.head + 1;  // next is where head will point to after this write.
-	if (next >= (uartComBuffer.maxlen-1))
+	if (next >= (uartComBuffer.maxlen))
 			next = 0;
 
 	if (next == uartComBuffer.tail){  // if the head + 1 == tail, circular buffer is full

@@ -17,9 +17,9 @@
 #define SERVO360_REPEAT_INITIALIZATION 3	//powtórzenie wypełnienia do kolejnego sprawdzenia
 #define SERVO360_MAX_REPEAT_TO_ERROR_IN_INITIALIZATION 20 //powtórzenia sekwencji inicjalizującej po której ma nastapić błąd
 #define SERVO360_PERIOD_ROTATION_RIGHT 4200 //wypełnienie podczas obrotu w lewo
-#define SERVO360_PERIOD_ROTATION_LEFT 3012 // wpełnienie podczas obrotu w prawo
+static volatile int SERVO360_PERIOD_ROTATION_LEFT=3027; // wpełnienie podczas obrotu w prawo
 #define SERVO360_REPEAT_ROTATION 8 //powtórzenie podczas oboru
-#define SERVO360_DELAY_TO_CHANGE_PERIOD 3 //opóznienie ustawienia nowego wypełnienia
+static volatile int SERVO360_DELAY_TO_CHANGE_PERIOD=5; //opóznienie ustawienia nowego wypełnienia
 
 volatile static uint8_t servo360RepeatAngle[]={
 		9, //Powtórzenie dla obrotu o 15 stopni
@@ -89,4 +89,5 @@ void servo360SetCurrentPositionByPositionNumber(uint16_t number);
 void servo360SetTargetPosition(servo360_Position position);
 void servo360NextPosition();
 void servo360PrevPosition();
+void servo36GoToIdleFromMeasurment();
 #endif /* INC_SERVO360_H_ */
