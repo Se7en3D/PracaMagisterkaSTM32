@@ -22,4 +22,5 @@ void hcsr04CalculateDistance();
 float hcsr04GetCelculatedValue();
 uint32_t hcsr04GetTimeout();
 void hcsr04ClearTimeout();
+void hcsr04ClearMeasurement();
 #endif /* INC_HC_SR04_H_ */

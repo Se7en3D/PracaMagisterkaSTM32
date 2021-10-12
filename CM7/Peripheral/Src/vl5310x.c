@@ -731,7 +731,7 @@ void vl53l0xStopContinuous(){
 // (readRangeSingleMillimeters() also calls this function after starting a
 // single-shot range measurement)
 uint16_t vl53l0xReadRangeContinuousMillimeters(){
-	int i=2555;
+	int i=200;
 	while ((vl53l0xReadReg(RESULT_INTERRUPT_STATUS) & 0x07) == 0){
 		if (i<1){
 			vl53l0xReg_s.did_timeout = 1;

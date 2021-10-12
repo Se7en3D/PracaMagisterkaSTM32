@@ -18,7 +18,7 @@ void stateMachineInit(TIM_HandleTypeDef *htim ,GPIO_TypeDef *GPIOOUT,uint16_t L2
 	drivingStructure.htim=htim;
 	drivingStructure.htimPeriod=htim->Init.Period;
 	drivingStructure.htimFullPulse=drivingStructure.htimPeriod+10;
-	drivingStructure.htimHalfPulse=drivingStructure.htimPeriod*0.7;
+	drivingStructure.htimHalfPulse=drivingStructure.htimPeriod*0.1;
 
 	drivingStructure.previousDrivingStatus=IDLE_DRIVING;
 	drivingStructure.drivingStatus=IDLE_DRIVING;
@@ -73,7 +73,7 @@ void stateMachineRotateLeft(){
 		return;
 
 	stateMachineSetHtimCompare(drivingStructure.htimFullPulse,drivingStructure.htimFullPulse);
-	stateMachineSetOutput(GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_SET);
+	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_SET,GPIO_PIN_RESET);
 }
 void stateMachineRotateRight(){
 	stateMachineInitNewState();
@@ -83,7 +83,25 @@ void stateMachineRotateRight(){
 		return;
 
 	stateMachineSetHtimCompare(drivingStructure.htimFullPulse,drivingStructure.htimFullPulse);
-	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_SET,GPIO_PIN_RESET);
+	stateMachineSetOutput(GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_SET);
+}
+void stateMachineRotateBackLeft(){
+	stateMachineInitNewState();
+	drivingStructure.drivingStatus=GO_UP_RIGHT;
+	if(drivingStructure.previousDrivingStatus==drivingStructure.drivingStatus)
+		return;
+
+	stateMachineSetHtimCompare(drivingStructure.htimHalfPulse,drivingStructure.htimFullPulse);
+	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
+}
+void stateMachineRotateBackRight(){
+	stateMachineInitNewState();
+	drivingStructure.drivingStatus=GO_UP_LEFT;
+	if(drivingStructure.previousDrivingStatus==drivingStructure.drivingStatus)
+		return;
+
+	stateMachineSetHtimCompare(drivingStructure.htimFullPulse,drivingStructure.htimHalfPulse);
+	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
 }
 void stateMachineStopDriving(){
 	stateMachineInitNewState();

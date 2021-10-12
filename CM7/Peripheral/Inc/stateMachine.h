@@ -49,6 +49,8 @@ void stateMachineDrivingRight();
 void stateMachineDrivingBack();
 void stateMachineRotateLeft();
 void stateMachineRotateRight();
+void stateMachineRotateBackLeft();
+void stateMachineRotateBackRight();
 void stateMachineStopDriving();
 void stateMachineMeasureDistance();
 void stateMachineMeasureDistanceEnd();

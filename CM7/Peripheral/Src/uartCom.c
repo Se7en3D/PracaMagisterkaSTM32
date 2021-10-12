@@ -270,7 +270,7 @@ uint32_t uartComGetBufferLength(){
 	}
 
 	if(uartComBuffer.head<uartComBuffer.tail){
-		uint32_t length=uartComBuffer.maxlen-uartComBuffer.tail-1;
+		uint32_t length=uartComBuffer.maxlen-uartComBuffer.tail;
 		uartComBuffer.tail=0;
 		return length;
 	}else{

@@ -28,9 +28,14 @@ void irSensorReadStatusIrSensor(){
 			errorCodePush(IRSENSOR_GPIO_POINTER_NULL);
 			continue;
 		}
-		irSensor.collision[i]=HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
+		irSensor.collision[i]=!HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
 
 	}
+
+	/*
+			 * MASKOWANIE IR_8 BłĄD w POłĄCZENIU ???
+			 */
+			irSensor.collision[IR_NR8_NUMBER]=0;
 }
 uint8_t irSensorGetCollision(uint8_t number){
 	return irSensor.collision[number];

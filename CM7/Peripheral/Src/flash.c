@@ -13,7 +13,7 @@ void flashInit(uint32_t FlashBankBase,uint32_t FlashSector,uint32_t flashSectorS
 	flashBaseStructure.flashRowIndex=FLASH_NB_32BITWORD_IN_FLASHWORD;
 	flashBaseStructure.baseAddress=(uint32_t *)(FlashBankBase+FlashSector*flashSectorSize);
 	flashBaseStructure.lastAddress=(uint32_t *)(FlashBankBase+FlashSector*flashSectorSize*2);
-	uint32_t resultSearch=flashSerachSaveAndReadAddress();
+	// uint32_t resultSearch=flashSerachSaveAndReadAddress();
 	/*switch(resultSearch){
 	case FLASH_READY:
 		flashBaseStructure.flashReady=1;

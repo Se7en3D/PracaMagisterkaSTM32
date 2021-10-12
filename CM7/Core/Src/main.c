@@ -272,11 +272,17 @@ Error_Handler();
 		  case ROTATE_RIGHT:
 			  stateMachineRotateRight();
 			  break;
+		  case RIDE_BACKWARD_RIGHT:
+			  stateMachineRotateBackRight();
+			  break;
+		  case RIDE_BACKWARD_LEFT:
+			  stateMachineRotateBackLeft();
+			  break;
 		  case STOP_FUN:
 			  stateMachineStopDriving();
 			  break;
-		  case MEASURE_DISTANCE_FUN:
-			  stateMachineMeasureDistance(servo360_Position6);
+		  case MEASURE_DISTANCE_FUN: //Wykonanie pomiaru odległości Brak w najnowszej wersji
+
 			  break;
 		  case CALIBRATION_PWM_DATA:
 			  servo360NewDataPWM(framepointer);
@@ -381,14 +387,6 @@ Error_Handler();
 		  uartComSendIrSensorStatus(irSensorGetAllCollision(),MAX_SENSOR_IR);
 		  irSensorClearTime();
 	  }
-	  //if(servo360Structure.status==servo360_IDLE){
-		  //servo360SetTargetPosition(position);
-		//  servo360SetCurrentPositionByPositionNumber(currentPosition);
-		//  currentPosition++;
-		//  if(currentPosition>SERVO360_MAX_POSITION){
-		//	  currentPosition=0;
-		//  }
-	  //}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -1096,6 +1094,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	if(htim==&htim7){
 		irSensorAddTime();
 		adcAddTime();
+		connectionModuleaddTimeout(&measurmentStructure);
 	}
 	if(htim==&htim13){
 		servo360PWMEdit();

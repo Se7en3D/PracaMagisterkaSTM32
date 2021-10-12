@@ -55,3 +55,8 @@ uint32_t hcsr04GetTimeout(){
 void hcsr04ClearTimeout(){
 	hcsr04Tim2_p->timeout=0;
 }
+
+void hcsr04ClearMeasurement(){
+	hcsr04Tim2_p->isCalculated=0;
+	hcsr04Tim2_p->timeout=0;
+}
