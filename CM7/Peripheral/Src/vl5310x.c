@@ -731,6 +731,36 @@ void vl53l0xStopContinuous(){
 // (readRangeSingleMillimeters() also calls this function after starting a
 // single-shot range measurement)
 uint16_t vl53l0xReadRangeContinuousMillimeters(){
+	switch(vl53l0xReg_s.vl53l0xReadRangeContinuousStatus){
+		case vl53l0xReadRangeContinuous_Idle:
+			vl53l0xReg_s.distance=200;
+			vl53l0xReg_s.vl53l0xReadRangeContinuousStatus=vl53l0xReadRangeContinuous_WaitToReturn07FromResultInterruptStatus;
+			break;
+
+		case vl53l0xReadRangeContinuous_WaitToReturn07FromResultInterruptStatus:
+			if((vl53l0xReadReg(RESULT_INTERRUPT_STATUS) & 0x07) != 0){
+				vl53l0xReg_s.distance=vl53l0xReadReg16Bit(RESULT_RANGE_STATUS + 10);
+				vl53l0xReg_s.vl53l0xReadRangeContinuousStatus=vl53l0xReadRangeContinuous_WaitToReadData;
+			}else{
+				if(vl53l0xReg_s.distance==0){
+					errorCodePush(VL5310X_TIMEOUT_READRANGECONTINUOUSMILLIMETERS);
+					vl53l0xReg_s.vl53l0xReadRangeContinuousStatus=vl53l0xReadRangeContinuous_Idle;
+				}else{
+					vl53l0xReg_s.distance--;
+				}
+			}
+			break;
+
+		case vl53l0xReadRangeContinuous_WaitToReadData:
+				vl53l0xReg_s.vl53l0xReadRangeContinuousStatus=vl53l0xReadRangeContinuous_Idle;
+				return vl53l0xReg_s.vl53l0xReadRangeContinuousStatus;
+			break;
+
+		default:
+			vl53l0xReg_s.vl53l0xReadRangeContinuousStatus=vl53l0xReadRangeContinuous_Idle;
+	}
+	return 0;
+	/*
 	int i=200;
 	while ((vl53l0xReadReg(RESULT_INTERRUPT_STATUS) & 0x07) == 0){
 		if (i<1){
@@ -747,7 +777,7 @@ uint16_t vl53l0xReadRangeContinuousMillimeters(){
 
   vl53l0xWriteReg(SYSTEM_INTERRUPT_CLEAR, 0x01);
 
-  return range;
+  return range;*/
 }
 
 // Performs a single-shot range measurement and returns the reading in

@@ -86,6 +86,11 @@
 #define      ALGO_PHASECAL_LIM                            0x30
 #define      ALGO_PHASECAL_CONFIG_TIMEOUT                 0x30
 
+typedef enum {
+	vl53l0xReadRangeContinuous_Idle,
+	vl53l0xReadRangeContinuous_WaitToReturn07FromResultInterruptStatus,
+	vl53l0xReadRangeContinuous_WaitToReadData,
+}vl53l0xReadRangeContinuousStatusEnum;
 typedef struct{
 	uint8_t address;
 	uint8_t last_status; // status of last I2C transmission
@@ -112,6 +117,8 @@ typedef struct{
     GPIO_TypeDef *xshutPort;
     uint16_t gpio1Pin;
     GPIO_TypeDef *gpio1Port;
+    uint16_t distance;
+    vl53l0xReadRangeContinuousStatusEnum vl53l0xReadRangeContinuousStatus;
 }vl53l0x_reg_t;
 
 typedef enum {

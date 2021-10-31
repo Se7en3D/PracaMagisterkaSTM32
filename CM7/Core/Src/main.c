@@ -353,7 +353,6 @@ Error_Handler();
 		  uartComSendAdcBatteryVoltage(value);
 	  }*/
 
-
 	  switch(adcStage()){
 	 // case ADC_START_CONVERSION:
 		//  HAL_ADC_Start_IT(&hadc1);
