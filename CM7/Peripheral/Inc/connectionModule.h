@@ -10,7 +10,7 @@
 
 #define drivingStatusSize 10
 #define TIMEOUT_TO_SEND 1000 //ilość czasu po której należy wysłać pomiar (jednostka ms)
-#define measurmentStatusFunctionArreySize 2
+#define measurmentStatusFunctionArreySize 3
 #define connectionModuleLockDistance 1
 #define connectionModuleUnlockDistance 0
 

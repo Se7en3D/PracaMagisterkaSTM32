@@ -164,6 +164,7 @@ uint8_t vl53l0xGetVcselPulsePeriod(vcselPeriodType type);
 void vl53l0xStartContinuous(uint32_t period_ms);
 void vl53l0xStopContinuous();
 uint16_t vl53l0xReadRangeContinuousMillimeters();
+uint16_t vl53l0xIsReadyToSend();
 void vl53l0xClearInterruptFlag();
 uint16_t vl53l0xReadRangeSingleMillimeters();
 

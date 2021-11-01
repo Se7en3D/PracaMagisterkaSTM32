@@ -779,6 +779,14 @@ uint16_t vl53l0xReadRangeContinuousMillimeters(){
 
   return range;*/
 }
+uint16_t vl53l0xIsReadyToSend(){
+	if(vl53l0xReg_s.vl53l0xReadRangeContinuousStatus==vl53l0xReadRangeContinuous_WaitToReadData){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+
 void vl53l0xClearInterruptFlag(){
 	vl53l0xWriteReg(SYSTEM_INTERRUPT_CLEAR, 0x01);
 

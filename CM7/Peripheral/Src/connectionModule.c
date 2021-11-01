@@ -67,25 +67,26 @@ void connectrionModuleFunctionMeasurmentIdle(servo360_Base_Structure * servo360S
 void connectionModuleFunctionMeasurmentWait(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS){
 	if(measureS->timeout>=TIMEOUT_TO_SEND){
 		errorCodePush(CONNECTIONMODULE_TIMEOUT_DISTANCE_MEASUREMENT);
-		measureS->timeout=0;
 		measureS->measurmentStatus=connectionModuleMeasurment_SendDistance;
 	}else{
 		uint8_t lockStatusFromHcSr04=(measureS->isDistanceHcSr04Lock==connectionModuleLockDistance);
-		uint8_t lockStatusFromVl5310x=(measureS->distanceVl5310x==connectionModuleLockDistance);
+		uint8_t lockStatusFromVl5310x=(measureS->isDistanceVl5310xLock==connectionModuleLockDistance);
 
 		if(hcsr04IsReadyToSend() && !lockStatusFromHcSr04){
 			measureS->distanceHcSr04=hcsr04GetCelculatedValue();
 			measureS->isDistanceHcSr04Lock=connectionModuleLockDistance;
+			lockStatusFromHcSr04=(measureS->isDistanceHcSr04Lock==connectionModuleLockDistance);
 		}
 
-		if(!lockStatusFromVl5310x){
-			if()
-
+		if(vl53l0xIsReadyToSend() && !lockStatusFromVl5310x){
+			measureS->distanceVl5310x=vl53l0xReadRangeContinuousMillimeters();
+			measureS->isDistanceVl5310xLock=connectionModuleLockDistance;
+			lockStatusFromVl5310x=(measureS->isDistanceVl5310xLock==connectionModuleLockDistance);
 		}
 
 
 		if(lockStatusFromHcSr04 && lockStatusFromVl5310x){
-
+			measureS->measurmentStatus=connectionModuleMeasurment_SendDistance;
 		}
 	}
 
@@ -115,7 +116,23 @@ void connectionModuleFunctionMeasurmentWait(servo360_Base_Structure * servo360S,
 }
 
 void connectionModuleFunctionMeasurmentSend(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS){
+	uint16_t distanceVl5310x=0;
+	float distanceHcSr04=0;
+	uint8_t lockStatusFromHcSr04=(measureS->isDistanceHcSr04Lock==connectionModuleLockDistance);
+	uint8_t lockStatusFromVl5310x=(measureS->distanceVl5310x==connectionModuleLockDistance);
 
+	if(lockStatusFromHcSr04){
+		distanceHcSr04=measureS->distanceHcSr04;
+		measureS->isDistanceHcSr04Lock=connectionModuleUnlockDistance;
+	}
 
+	if(lockStatusFromVl5310x){
+		distanceVl5310x=measureS->distanceVl5310x;
+		measureS->isDistanceVl5310xLock=connectionModuleUnlockDistance;
+	}
+
+	servo36GoToIdleFromMeasurment();
+	uartComSendDistanceServo(distanceHcSr04, distanceVl5310x);
+	measureS->measurmentStatus=connectionModuleMeasurment_Idle;
 }
 
