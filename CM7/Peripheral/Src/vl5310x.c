@@ -779,6 +779,10 @@ uint16_t vl53l0xReadRangeContinuousMillimeters(){
 
   return range;*/
 }
+void vl53l0xClearInterruptFlag(){
+	vl53l0xWriteReg(SYSTEM_INTERRUPT_CLEAR, 0x01);
+
+}
 
 // Performs a single-shot range measurement and returns the reading in
 // millimeters

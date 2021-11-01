@@ -86,11 +86,17 @@
 #define      ALGO_PHASECAL_LIM                            0x30
 #define      ALGO_PHASECAL_CONFIG_TIMEOUT                 0x30
 
+
 typedef enum {
 	vl53l0xReadRangeContinuous_Idle,
 	vl53l0xReadRangeContinuous_WaitToReturn07FromResultInterruptStatus,
 	vl53l0xReadRangeContinuous_WaitToReadData,
 }vl53l0xReadRangeContinuousStatusEnum;
+
+#define VL53L0X_READ_NONE_RANGE 65535
+#define VL53L0X_READ_CONTINOUS_TIMEOUT 200
+
+
 typedef struct{
 	uint8_t address;
 	uint8_t last_status; // status of last I2C transmission
@@ -158,6 +164,7 @@ uint8_t vl53l0xGetVcselPulsePeriod(vcselPeriodType type);
 void vl53l0xStartContinuous(uint32_t period_ms);
 void vl53l0xStopContinuous();
 uint16_t vl53l0xReadRangeContinuousMillimeters();
+void vl53l0xClearInterruptFlag();
 uint16_t vl53l0xReadRangeSingleMillimeters();
 
 inline void vl53l0xSetTimeoutDrivingStatus(uint16_t timeout) { vl53l0xReg_s.io_timeout = timeout; }

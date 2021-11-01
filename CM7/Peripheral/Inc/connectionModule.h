@@ -11,6 +11,8 @@
 #define drivingStatusSize 10
 #define TIMEOUT_TO_SEND 1000 //ilość czasu po której należy wysłać pomiar (jednostka ms)
 #define measurmentStatusFunctionArreySize 2
+#define connectionModuleLockDistance 1
+#define connectionModuleUnlockDistance 0
 
 static volatile servo360_Position tabPositionByDriving[drivingStatusSize][5]={
 		{servo360_PositionNone}, //IDLE_DRIVING
@@ -25,13 +27,16 @@ static volatile servo360_Position tabPositionByDriving[drivingStatusSize][5]={
 		{servo360_Position6,servo360_PositionNone}, //GO_BACK_RIGHT
 };
 typedef enum{
-	connectionModuleMeasurmentIDLE=0,
-	connectionModuleMeasurmentWAIT,
+	connectionModuleMeasurment_Idle=0,
+	connectionModuleMeasurment_Wait,
+	connectionModuleMeasurment_SendDistance,
 }connectionModuleMeasurmentStatus;
 
 typedef struct{
 	float distanceHcSr04;
 	uint16_t distanceVl5310x;
+	uint8_t isDistanceHcSr04Lock;
+	uint8_t isDistanceVl5310xLock;
 	int timeout;
 	connectionModuleMeasurmentStatus measurmentStatus;
 
@@ -49,4 +54,5 @@ void connectionModuleaddTimeout(measurmentStructure_t *measureS);
 void connectionModuleMeasureDistance(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
 void connectrionModuleFunctionMeasurmentIdle(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
 void connectionModuleFunctionMeasurmentWait(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
+void connectionModuleFunctionMeasurmentSend(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
 #endif /* INC_CONNECTIONMODULE_H_ */
