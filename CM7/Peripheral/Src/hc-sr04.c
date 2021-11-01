@@ -31,6 +31,13 @@ void hcsr04CalculateDistance(){
 		hcsr04Tim2_p->isCalculated=1;
 	}
 }
+uint8_t hcsr04IsReadyToSend(){
+	if(hcsr04Tim2_p->isCalculated==1){
+		return 1;
+	}else{
+		return 0;
+	}
+}
 
 float hcsr04GetCelculatedValue(){
 	if(hcsr04Tim2_p!=0){

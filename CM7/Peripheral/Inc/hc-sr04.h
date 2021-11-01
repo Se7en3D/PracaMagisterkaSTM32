@@ -19,6 +19,7 @@ hcsr04_t *hcsr04Tim2_p;
 void hcsr04CompCH1Add(uint32_t value);
 void hcsr04CompCH2Add(uint32_t value);
 void hcsr04CalculateDistance();
+uint8_t hcsr04IsReadyToSend();
 float hcsr04GetCelculatedValue();
 uint32_t hcsr04GetTimeout();
 void hcsr04ClearTimeout();
