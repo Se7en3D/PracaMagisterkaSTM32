@@ -143,14 +143,14 @@ void uartComSendAdcBatteryVoltage(uint32_t value){
 	uartComPush(0xFE);
 	uartComPush(0xFE);
 }
-void uartComSendDistanceServo(float hcSr04, uint16_t vl5310x){
+void uartComSendDistanceServo(float hcSr04, uint16_t vl5310x,uint16_t position){
 	if(uartCommunication_p==0){
 		return ;
 	}
 	uint8_t *tempArrayHc5r04=(uint8_t*)(&hcSr04);
 	uartComPush(0xFF); //Początek ramki
 	uartComPush(SEND_MEASUREMENT_FUN);
-	uartComPush(uartComSensorFrame.position);
+	uartComPush(position);
 	uartComPush(tempArrayHc5r04[0]);
 	uartComPush(tempArrayHc5r04[1]);
 	uartComPush(tempArrayHc5r04[2]);

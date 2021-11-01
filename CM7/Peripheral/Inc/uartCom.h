@@ -93,7 +93,7 @@ void uartComAddFrame(uint8_t data);
 uint8_t* uartComGetFrame();
 void uartComClearFrame();
 void uartComSendDistance(float hcSr04, uint16_t vl5310x);
-void uartComSendDistanceServo(float hcSr04, uint16_t vl5310x);
+void uartComSendDistanceServo(float hcSr04, uint16_t vl5310x,uint16_t position);
 void uartComSendErrorCode(uint8_t errorCode);
 void uartComSendIrSensorStatus(uint8_t *collision,uint16_t size);
 void uartComSendAdcBatteryVoltage(uint32_t value);

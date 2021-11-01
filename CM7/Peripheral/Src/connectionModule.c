@@ -42,7 +42,7 @@ void connectionModuleStateMachineWithServo360(driving_status_t drivingStatus){
 }
 
 void connectionModuleaddTimeout(measurmentStructure_t *measureS){
-	if(measureS->distanceHcSr04==0.0){
+	if(measureS->measurmentStatus==connectionModuleMeasurment_Wait){
 		measureS->timeout++;
 	}else{
 		measureS->timeout=0;
@@ -50,13 +50,12 @@ void connectionModuleaddTimeout(measurmentStructure_t *measureS){
 
 }
 void connectionModuleMeasureDistance(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS){
-	if(servo360S->status==servo360_WAIT_TO_MEASURMENT){
 		measurmentStatusFunction[measureS->measurmentStatus](servo360S,measureS);
-	}
 }
 
 void connectrionModuleFunctionMeasurmentIdle(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS){
-	if(measureS->measurmentStatus==connectionModuleMeasurment_Idle){
+	servo360_state servo360Status=servo360S->status;
+	if(servo360Status==servo360_WAIT_TO_MEASURMENT){
 		hcsr04ClearMeasurement();
 		vl53l0xClearInterruptFlag();
 		measureS->timeout=0;
@@ -77,7 +76,7 @@ void connectionModuleFunctionMeasurmentWait(servo360_Base_Structure * servo360S,
 			measureS->isDistanceHcSr04Lock=connectionModuleLockDistance;
 			lockStatusFromHcSr04=(measureS->isDistanceHcSr04Lock==connectionModuleLockDistance);
 		}
-
+		vl53l0xReadRangeContinuousMillimeters();
 		if(vl53l0xIsReadyToSend() && !lockStatusFromVl5310x){
 			measureS->distanceVl5310x=vl53l0xReadRangeContinuousMillimeters();
 			measureS->isDistanceVl5310xLock=connectionModuleLockDistance;
@@ -120,7 +119,7 @@ void connectionModuleFunctionMeasurmentSend(servo360_Base_Structure * servo360S,
 	float distanceHcSr04=0;
 	uint8_t lockStatusFromHcSr04=(measureS->isDistanceHcSr04Lock==connectionModuleLockDistance);
 	uint8_t lockStatusFromVl5310x=(measureS->distanceVl5310x==connectionModuleLockDistance);
-
+	uint16_t position=servo360S->currentPosition;
 	if(lockStatusFromHcSr04){
 		distanceHcSr04=measureS->distanceHcSr04;
 		measureS->isDistanceHcSr04Lock=connectionModuleUnlockDistance;
@@ -132,7 +131,7 @@ void connectionModuleFunctionMeasurmentSend(servo360_Base_Structure * servo360S,
 	}
 
 	servo36GoToIdleFromMeasurment();
-	uartComSendDistanceServo(distanceHcSr04, distanceVl5310x);
+	uartComSendDistanceServo(distanceHcSr04, distanceVl5310x,position);
 	measureS->measurmentStatus=connectionModuleMeasurment_Idle;
 }
 
