@@ -129,7 +129,6 @@ void connectionModuleFunctionMeasurmentSend(servo360_Base_Structure * servo360S,
 		distanceVl5310x=measureS->distanceVl5310x;
 		measureS->isDistanceVl5310xLock=connectionModuleUnlockDistance;
 	}
-
 	servo36GoToIdleFromMeasurment();
 	uartComSendDistanceServo(distanceHcSr04, distanceVl5310x,position);
 	measureS->measurmentStatus=connectionModuleMeasurment_Idle;
