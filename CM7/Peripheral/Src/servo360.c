@@ -62,26 +62,26 @@ void servo360PWMDefault(){
 
 void servo360NewDataPWM(uint8_t *framePointer){
 
-	int timer=0;
+	int repeat=0;
 	if(servo360Structure.repeatValue!=0){
 		return;
 	}
-	while(framePointer[timer]!=0xFE){
-		if(timer>50)
+	while(framePointer[repeat]!=0xFE){
+		if(repeat>50)
 			break;
 
-		timer++;
+		repeat++;
 	}
 
-	if(timer>50 || timer<5){
+	if(repeat>50 || repeat<5){
 		return;
 	}
 	uint16_t period=framePointer[2]<<8;
 	period|=framePointer[3];
 
-	uint16_t repeat=framePointer[4]<<8;
+	uint16_t repeata=framePointer[4]<<8;
 	repeat|=framePointer[5];
-	servo360Structure.repeatValue=repeat;
+	servo360Structure.repeatValue=repeata;
 	servo360Structure.period=period;
 	//printf("repeat=%d period=%d %x %x\n",repeat,period,framePointer[2],framePointer[3]);
 }
@@ -189,7 +189,7 @@ void servo360SetTargetPosition(servo360_Position position){
 	}
 }
 
-void servo36GoToIdleFromMeasurment(){
+void servo360GoToIdleFromMeasurment(){
 	if(servo360Structure.status==servo360_WAIT_TO_MEASURMENT){
 		servo360Structure.status=servo360_IDLE;
 	}

@@ -34,6 +34,7 @@
 #include "adc.h"
 #include "servo360.h"
 #include "connectionModule.h"
+#include "servoPR.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -210,6 +211,7 @@ Error_Handler();
   uartCommunication_p=&(uartCommunication_t){&huart4,{0},{0},0,0};
   stateMachineInit(&htim12,GPIOE,GPIO_PIN_2,GPIO_PIN_3,GPIO_PIN_4,GPIO_PIN_5);
   uartComSensorInit(&htim13);
+  servoPRInit(&servoPRGeneralStructure,&htim2);
   	  /*Inizjalizacja peryfreriów przy pomocy biblioteki HAL */
   HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_2);

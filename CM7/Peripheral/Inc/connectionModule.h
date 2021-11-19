@@ -8,13 +8,24 @@
 #ifndef INC_CONNECTIONMODULE_H_
 #define INC_CONNECTIONMODULE_H_
 
-#define drivingStatusSize 10
-#define TIMEOUT_TO_SEND 1000 //ilość czasu po której należy wysłać pomiar (jednostka ms)
-#define measurmentStatusFunctionArreySize 3
+/**
+  * @brief Stała  określająca wielkość pierwszego wymiaru tablicy tabPositionByDriving
+  */
+#define drivingStatusSizeFirstDimension 10
+/**
+  * @brief Stała  określająca wielkość drugiego wymiaru tablicy tabPositionByDriving
+  */
+#define drivingStatusSizeSecondDimension 5
+/**
+  * @brief Stała czasowa określająca po jakim czasie nalezy wysłąć pomiary odległości
+  * 		jeśli któryś z czujników nie bedzie odpowiadał[ms]
+  */
+#define TIMEOUT_TO_SEND 1000
+#define measurmentStatusFunctionArreySize 3 //?? co z tym zrobić ??
 #define connectionModuleLockDistance 1
 #define connectionModuleUnlockDistance 0
 
-static volatile servo360_Position tabPositionByDriving[drivingStatusSize][5]={
+static volatile servo360_Position tabPositionByDriving[drivingStatusSizeFirstDimension][drivingStatusSizeSecondDimension]={
 		{servo360_PositionNone}, //IDLE_DRIVING
 		{servo360_Position8,servo360_Position9,servo360_Position10,servo360_PositionNone}, //GO_UP_LEFT
 		{servo360_Position2,servo360_Position3,servo360_Position4,servo360_PositionNone}, //GO_UP_RIGHT

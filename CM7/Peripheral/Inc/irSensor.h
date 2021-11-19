@@ -19,9 +19,22 @@
 #define IR_NR6_NUMBER 5
 #define IR_NR7_NUMBER 6
 #define IR_NR8_NUMBER 7
+#define IR_SENSOR_DOES_NOT_EXIST 0
+#define IR_SENSOR_NOT_DETECTED_COLLISION 0
+#define IR_SENSOR_DETECTED_COLLISION 1
+#define IR_SENSOR_EXIST 1
 #define TIME_TO_SEND_STATUS_IR 500 //czas(ms) do wysłania statusu od sensorów podczerwieni
 
-
+volatile static int IrSensorExist[MAX_SENSOR_IR]={
+		IR_SENSOR_DOES_NOT_EXIST,
+		IR_SENSOR_EXIST,
+		IR_SENSOR_EXIST,
+		IR_SENSOR_DOES_NOT_EXIST,
+		IR_SENSOR_DOES_NOT_EXIST,
+		IR_SENSOR_EXIST,
+		IR_SENSOR_EXIST,
+		IR_SENSOR_DOES_NOT_EXIST
+};
 typedef struct{
 	GPIO_TypeDef *gpioIrPort[MAX_SENSOR_IR];
 	uint16_t gpioIrPin[MAX_SENSOR_IR];

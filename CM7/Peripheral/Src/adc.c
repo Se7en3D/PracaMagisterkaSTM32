@@ -13,12 +13,12 @@
 
 /**
   * @brief	Inicjaliazcja struktury ADC_HandleTypeDef do wartości domyślnych
-  * @param	wskaźnik hadc na strukturę ADC_HandleTypeDef zawierającą
+  * @param	hadc1 wskaźnik na strukturę ADC_HandleTypeDef zawierającą
   * 		informację na temat pomiaru napięcia oraz obecnego stanu przetwornika
-  * @param	Wskaźnik gpioPowerMeasureOn_OffPort struktury GPIO_TypeDef zawierającą
+  * @param	gpioPowerMeasureOn_OffPort Wskaźnik  struktury GPIO_TypeDef zawierającą
   * 		definiecję portu odpowiedzialnego za włączenie/wyłączenie
   * 		zasilania do pomiaru napięcia
-  * @param 	Zmienna gpioPowerMeasureOn_OffPin zawierająca numer pinu
+  * @param 	gpioPowerMeasureOn_OffPin Zmienna zawierająca numer pinu
   * 		odpowiedzialnego za włączenie/wyłączenie zasilania do pomiaru napięcia
   * @retval None
   */
@@ -35,7 +35,7 @@ void adcInit(ADC_HandleTypeDef *hadc1,GPIO_TypeDef *gpioPowerMeasureOn_OffPort,u
 
 /**
   * @brief  Zapisanie pomiaru napięcia do struktury adc_Base_structure_t
-  * @param  Zmienna data zawierająca pomiar przetwonika ADC
+  * @param  data Zmienna zawierająca pomiar przetwonika ADC
   * @retval None
   */
 void adcSetConversionValue(uint32_t data){

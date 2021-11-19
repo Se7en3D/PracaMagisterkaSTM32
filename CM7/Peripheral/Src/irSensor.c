@@ -23,19 +23,18 @@ void irSensorInitIrPinout(uint8_t number,uint16_t Pin,GPIO_TypeDef *port){
 void irSensorReadStatusIrSensor(){
 	for(int i=0;i<MAX_SENSOR_IR;i++){
 
-		if(irSensor.gpioIrPort[i]==0){
-			irSensor.collision[i]=0;
+		if(irSensor.gpioIrPort[i]==NULL){
+			irSensor.collision[i]=IR_SENSOR_NOT_DETECTED_COLLISION;
 			errorCodePush(IRSENSOR_GPIO_POINTER_NULL);
 			continue;
 		}
-		irSensor.collision[i]=!HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
 
+		if(IrSensorExist[i]==IR_SENSOR_EXIST){
+			irSensor.collision[i]=!HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
+		}else{
+			irSensor.collision[i]=IR_SENSOR_NOT_DETECTED_COLLISION;
+		}
 	}
-
-	/*
-			 * MASKOWANIE IR_8 BłĄD w POłĄCZENIU ???
-			 */
-			irSensor.collision[IR_NR8_NUMBER]=0;
 }
 uint8_t irSensorGetCollision(uint8_t number){
 	return irSensor.collision[number];

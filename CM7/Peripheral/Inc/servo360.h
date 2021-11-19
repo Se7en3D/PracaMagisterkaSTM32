@@ -52,14 +52,16 @@ typedef enum{
 	servo360_Position12
 }servo360_Position;
 
-typedef enum{
-	servo360_INITIALIZATION=0,
-	servo360_IDLE,
-	servo360_ROTATE,
-	servo360_WAIT_TO_STABILIZE_SERVO,
-	servo360_WAIT_TO_MEASURMENT,
-	servo360_ERROR_INITIALIZATION,
-}servo360_state;
+#ifndef servo360_state
+	typedef enum{
+		servo360_INITIALIZATION=0,
+		servo360_IDLE,
+		servo360_ROTATE,
+		servo360_WAIT_TO_STABILIZE_SERVO,
+		servo360_WAIT_TO_MEASURMENT,
+		servo360_ERROR_INITIALIZATION,
+	}servo360_state;
+#endif
 
 
 typedef struct{
@@ -89,5 +91,5 @@ void servo360SetCurrentPositionByPositionNumber(uint16_t number);
 void servo360SetTargetPosition(servo360_Position position);
 void servo360NextPosition();
 void servo360PrevPosition();
-void servo36GoToIdleFromMeasurment();
+void servo360GoToIdleFromMeasurment();
 #endif /* INC_SERVO360_H_ */
