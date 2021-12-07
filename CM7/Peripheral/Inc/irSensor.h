@@ -24,6 +24,7 @@
 #define IR_SENSOR_DETECTED_COLLISION 1
 #define IR_SENSOR_EXIST 1
 #define TIME_TO_SEND_STATUS_IR 500 //czas(ms) do wysłania statusu od sensorów podczerwieni
+#define	IRSENSOR_COLLISION_NEGATION 0
 
 volatile static int IrSensorExist[MAX_SENSOR_IR]={
 		IR_SENSOR_DOES_NOT_EXIST,

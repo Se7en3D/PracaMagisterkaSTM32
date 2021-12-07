@@ -32,7 +32,7 @@
 #include "stateMachine.h"
 #include "irSensor.h"
 #include "adc.h"
-#include "servo360.h"
+#include "servoPR.h"
 #include "connectionModule.h"
 #include "servoPR.h"
 /* USER CODE END Includes */
@@ -211,7 +211,7 @@ Error_Handler();
   uartCommunication_p=&(uartCommunication_t){&huart4,{0},{0},0,0};
   stateMachineInit(&htim12,GPIOE,GPIO_PIN_2,GPIO_PIN_3,GPIO_PIN_4,GPIO_PIN_5);
   uartComSensorInit(&htim13);
-  servoPRInit(&servoPRGeneralStructure,&htim2);
+  servoPRInit(&servoPRGeneralStructure,&htim13,TIM_CHANNEL_1);
   	  /*Inizjalizacja peryfreriów przy pomocy biblioteki HAL */
   HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_2);
@@ -222,8 +222,6 @@ Error_Handler();
   HAL_TIM_Base_Start(&htim12);
   HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
-  HAL_TIM_Base_Start_IT(&htim13);
-  HAL_TIM_PWM_Start_IT(&htim13, TIM_CHANNEL_1);
   HAL_TIM_Base_Start_IT(&htim7);
 	  /*inicjalizacja pozostałych modłów przy pomocy własnych bibliotek*/
   vl53l0xSetAddress(0x52);
@@ -245,7 +243,6 @@ Error_Handler();
   irSensorInitIrPinout(IR_NR8_NUMBER,IR_NR_8_Pin,IR_NR_8_GPIO_Port);
 
   adcInit(&hadc1,OPTOCOUPLER_POWER_ON_GPIO_Port,OPTOCOUPLER_POWER_ON_Pin);
-  servo360Init(&htim13,LIMIT_SWITCH_SERVO_Pin,LIMIT_SWITCH_SERVO_GPIO_Port);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -287,7 +284,7 @@ Error_Handler();
 
 			  break;
 		  case CALIBRATION_PWM_DATA:
-			  servo360NewDataPWM(framepointer);
+			  //servo360NewDataPWM(framepointer);
 			  break;
 		  case UNIMPORTANT_ERROR: //Brak żadnych komend
 			  break;
@@ -298,8 +295,8 @@ Error_Handler();
 		  }
 		  uartComClearFrame();
 	  }
-	  connectionModuleStateMachineWithServo360(drivingStructure.drivingStatus);
-	  connectionModuleMeasureDistance(&servo360Structure,&measurmentStructure);
+	  connectionModuleDrivingStatusWithPositionServo(&connectionBetweenServo360AndStateMachine,&drivingStructure,&servoPRGeneralStructure);
+	  connectionModuleMeasureDistance(&servoPRGeneralStructure,&measurmentStructure);
 
 	  //driving_status_t drivingStatusTemp=stateMachineGetDrivingStructure().drivingStatus;
 	  /*if(drivingStructure.drivingStatus!=IDLE_DRIVING){
@@ -367,7 +364,7 @@ Error_Handler();
 	  }
 
 
-	  servo360StateFunctions();
+	  servoPRExecuteStatusFunction(&servoPRGeneralStructure);
 
 
 	  	  //Sprawdzenie czy znajdują się jakieś błedy do wysłania
@@ -1096,9 +1093,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 		irSensorAddTime();
 		adcAddTime();
 		connectionModuleaddTimeout(&measurmentStructure);
+		servoPRAddTime(&servoPRGeneralStructure);
 	}
 	if(htim==&htim13){
-		servo360PWMEdit();
+
 	}
 	if(htim==&htim17){
 		stateMachineTimeout();

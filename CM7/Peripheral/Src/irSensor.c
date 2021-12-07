@@ -30,7 +30,11 @@ void irSensorReadStatusIrSensor(){
 		}
 
 		if(IrSensorExist[i]==IR_SENSOR_EXIST){
+#if IRSENSOR_COLLISION_NEGATION
 			irSensor.collision[i]=!HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
+#else
+			irSensor.collision[i]=HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
+#endif
 		}else{
 			irSensor.collision[i]=IR_SENSOR_NOT_DETECTED_COLLISION;
 		}

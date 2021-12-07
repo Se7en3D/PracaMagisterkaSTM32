@@ -9,7 +9,6 @@
 #include "errorCode.h"
 #include "hc-sr04.h"
 #include "irSensor.h"
-#include "servo360.h"
 #include "stateMachine.h"
 #include "uartCom.h"
 #include "vl5310x.h"

@@ -753,7 +753,7 @@ uint16_t vl53l0xReadRangeContinuousMillimeters(){
 
 		case vl53l0xReadRangeContinuous_WaitToReadData:
 				vl53l0xReg_s.vl53l0xReadRangeContinuousStatus=vl53l0xReadRangeContinuous_Idle;
-				return vl53l0xReg_s.vl53l0xReadRangeContinuousStatus;
+				return vl53l0xReg_s.distance;
 			break;
 
 		default:

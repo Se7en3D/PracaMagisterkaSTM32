@@ -40,7 +40,7 @@ typedef struct{
 }driving_structure_t;
 
 driving_structure_t drivingStructure;
-driving_status_t stateMachineGetDrivingStatus();
+driving_status_t stateMachineGetDrivingStatus(driving_structure_t *drivingStructure);
 
 void stateMachineInit(TIM_HandleTypeDef *htim ,GPIO_TypeDef *GPIOOUT,uint16_t L298NOUT1A,uint16_t L298NOUT2A,uint16_t L298NOUT1B,uint16_t L298NOUT2B);
 void stateMachineDrivingForward();
@@ -61,5 +61,5 @@ void stateMachineInitNewState();
 uint32_t stateMachineGetResetTimer();
 void stateMachineSetHtimCompare(uint16_t htimChannel1,uint16_t htimChannel2);
 driving_structure_t stateMachineGetDrivingStructure();
-
+uint8_t stateMachineDrabingsStatusIsEqual(driving_structure_t *drivingStatus);
 #endif /* INC_STATEMACHINE_H_ */

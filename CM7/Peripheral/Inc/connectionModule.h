@@ -5,8 +5,6 @@
  *      Author: Daniel
  */
 
-#ifndef INC_CONNECTIONMODULE_H_
-#define INC_CONNECTIONMODULE_H_
 
 /**
   * @brief Stała  określająca wielkość pierwszego wymiaru tablicy tabPositionByDriving
@@ -25,18 +23,8 @@
 #define connectionModuleLockDistance 1
 #define connectionModuleUnlockDistance 0
 
-static volatile servo360_Position tabPositionByDriving[drivingStatusSizeFirstDimension][drivingStatusSizeSecondDimension]={
-		{servo360_PositionNone}, //IDLE_DRIVING
-		{servo360_Position8,servo360_Position9,servo360_Position10,servo360_PositionNone}, //GO_UP_LEFT
-		{servo360_Position2,servo360_Position3,servo360_Position4,servo360_PositionNone}, //GO_UP_RIGHT
-		{servo360_Position5,servo360_Position6,servo360_Position7,servo360_PositionNone}, //GO_UP
-		{servo360_Position6,servo360_PositionNone},//GO_BACK
-		{servo360_Position10,servo360_Position11,servo360_Position12,servo360_PositionNone}, //ROTATE_LEFT_DRIV
-		{servo360_Position0,servo360_Position1,servo360_Position2,servo360_PositionNone}, //ROTATE_RIGHT_DRIV
-		{servo360_Position6,servo360_PositionNone}, //STOP_DRIVING
-		{servo360_Position6,servo360_PositionNone}, //GO_BACK_LEFT
-		{servo360_Position6,servo360_PositionNone}, //GO_BACK_RIGHT
-};
+#include "servoPR.h"
+
 typedef enum{
 	connectionModuleMeasurment_Idle=0,
 	connectionModuleMeasurment_Wait,
@@ -55,15 +43,15 @@ typedef struct{
 
 measurmentStructure_t measurmentStructure;
 typedef struct{
-	driving_status_t prevDrivingStatus;
-	int numberForTabPositionByDriving;
+	uint8_t numberForTabPositionByDriving;
+	int adder;
 }connectionBetweenServo360AndStateMachine_t;
 
 connectionBetweenServo360AndStateMachine_t  connectionBetweenServo360AndStateMachine;
-void connectionModuleStateMachineWithServo360(driving_status_t drivingStatus);
+void connectionModuleDrivingStatusWithPositionServo(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR);
 void connectionModuleaddTimeout(measurmentStructure_t *measureS);
-void connectionModuleMeasureDistance(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
-void connectrionModuleFunctionMeasurmentIdle(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
-void connectionModuleFunctionMeasurmentWait(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
-void connectionModuleFunctionMeasurmentSend(servo360_Base_Structure * servo360S,measurmentStructure_t *measureS);
-#endif /* INC_CONNECTIONMODULE_H_ */
+void connectionModuleMeasureDistance(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
+void connectrionModuleFunctionMeasurmentIdle(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
+void connectionModuleFunctionMeasurmentWait(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
+void connectionModuleFunctionMeasurmentSend(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
+void connectionModuleClearMeasurmentStatus(measurmentStructure_t *measurmentStructure);

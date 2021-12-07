@@ -172,4 +172,16 @@ driving_structure_t stateMachineGetDrivingStructure(){
 	return drivingStructure;
 }
 
+uint8_t stateMachineDrabingsStatusIsEqual(driving_structure_t *drivingStatus){
+	if(drivingStatus->previousDrivingStatus==drivingStatus->drivingStatus){
+		return TRUE;
+	}else{
+		return FALSE;
+	}
+
+}
+
+driving_status_t stateMachineGetDrivingStatus(driving_structure_t *drivingStructure){
+	return drivingStructure->drivingStatus;
+}
 
