@@ -24,10 +24,12 @@
 #define IR_SENSOR_DETECTED_COLLISION 1
 #define IR_SENSOR_EXIST 1
 #define TIME_TO_SEND_STATUS_IR 500 //czas(ms) do wysłania statusu od sensorów podczerwieni
+#define IRSENSOR_TIME_TO_READ_GPIO 10
 #define	IRSENSOR_COLLISION_NEGATION 0
+#define IRSENSOR_MAX_SAMPLE 5 //Maksymalna wielkość tablicy pobierającej stany wejścia pinu potrzebna do określania dominanty
 
 volatile static int IrSensorExist[MAX_SENSOR_IR]={
-		IR_SENSOR_DOES_NOT_EXIST,
+		IR_SENSOR_EXIST,
 		IR_SENSOR_EXIST,
 		IR_SENSOR_EXIST,
 		IR_SENSOR_DOES_NOT_EXIST,
@@ -37,11 +39,22 @@ volatile static int IrSensorExist[MAX_SENSOR_IR]={
 		IR_SENSOR_DOES_NOT_EXIST
 };
 typedef struct{
+	uint8_t gpioReadPinArray[IRSENSOR_MAX_SAMPLE];
+	uint8_t head;
+	uint8_t countOnPin;
+	uint8_t countOffPin;
+}irModeStruct;
+
+typedef struct{
 	GPIO_TypeDef *gpioIrPort[MAX_SENSOR_IR];
 	uint16_t gpioIrPin[MAX_SENSOR_IR];
 	uint8_t collision[MAX_SENSOR_IR];
-	uint32_t timer;
+	uint32_t timerToSendCollision;
+	uint32_t timerToReadGPIO;
+	irModeStruct modeStruct[MAX_SENSOR_IR];
 }ir_sensor_t;
+
+
 
 ir_sensor_t irSensor;
 
@@ -52,6 +65,9 @@ uint8_t *irSensorGetAllCollision();
 void irSensorAddTime();
 uint32_t irSensorGetTime();
 void irSensorClearTime();
+void irSensorAddSample(irModeStruct *mode,const uint8_t value);
+void irSensorCalcCollisionValue(ir_sensor_t *irSensor,const uint8_t sensorId);
+void irSensorResetModeStruct(irModeStruct *mode);
 
 
 #endif /* INC_IRSENSOR_H_ */
