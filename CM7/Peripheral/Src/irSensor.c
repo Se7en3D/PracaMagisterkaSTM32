@@ -19,9 +19,6 @@ void irSensorInitIrPinout(uint8_t number,uint16_t Pin,GPIO_TypeDef *port){
 	irSensor.collision[number]=0;
 	irSensor.timerToSendCollision=0;
 
-	for(int i=0;i<MAX_SENSOR_IR;i++){
-		irSensorResetModeStruct(&irSensor.modeStruct[i]);
-	}
 }
 
 void irSensorReadStatusIrSensor(){
@@ -44,11 +41,8 @@ void irSensorReadStatusIrSensor(){
 #else
 			value=HAL_GPIO_ReadPin(irSensor.gpioIrPort[i], irSensor.gpioIrPin[i]);
 #endif
-		//if(i==0){
-		//	printf("\n");
-		//}
-		irSensorAddSample(&irSensor.modeStruct[i],value);
-		irSensorCalcCollisionValue(&irSensor,i);
+		irSensorAddSample(&irSensor,i,value);
+
 		}else{
 			irSensor.collision[i]=IR_SENSOR_NOT_DETECTED_COLLISION;
 		}
@@ -72,54 +66,24 @@ uint32_t irSensorGetTime(){
 void irSensorClearTime(){
 	irSensor.timerToSendCollision=0;
 }
-void irSensorAddSample(irModeStruct *mode,const uint8_t value){
-	uint8_t head=mode->head;
-	mode->gpioReadPinArray[head]=value;
-	head++;
-	if(head>=IRSENSOR_MAX_SAMPLE){
-		head=0;
-	}
-	//if(mode->gpioReadPinArray[head]!=value){
-		if(value==IR_SENSOR_DETECTED_COLLISION){
-			if(mode->countOffPin>0){
-				mode->countOffPin--;
-				mode->countOnPin++;
-			}
-		}else{
-			if(mode->countOnPin>0){
-				mode->countOffPin++;
-				mode->countOnPin--;
-			}
+void irSensorAddSample(ir_sensor_t *irSensor,const uint8_t sensorId,const uint8_t value){
+	uint8_t sumOfSetGPIO=irSensor->sumOfSetGPIO[sensorId];
+	if(value){
+		if(sumOfSetGPIO<IRSENSOR_MAX_SAMPLE){
+			(sumOfSetGPIO)++;
 		}
-	//}
-	mode->head=head;
-}
-void irSensorCalcCollisionValue(ir_sensor_t *irSensor,const uint8_t sensorId){
-	/*uint8_t countOnPin=irSensor->modeStruct[sensorId].countOnPin;
-	uint8_t countOffPin=irSensor->modeStruct[sensorId].countOffPin;
-	if(countOnPin>countOffPin){
-		irSensor->collision[sensorId]=IR_SENSOR_DETECTED_COLLISION;
 	}else{
-		irSensor->collision[sensorId]=IR_SENSOR_NOT_DETECTED_COLLISION;
-	}*/
-	uint8_t count1=0;
-	uint8_t halSize=IRSENSOR_MAX_SAMPLE/2;
-	for(int i=0;i<IRSENSOR_MAX_SAMPLE;i++){
-		if(irSensor->modeStruct[sensorId].gpioReadPinArray[i]==IR_SENSOR_DETECTED_COLLISION){
-			count1++;
+		if(sumOfSetGPIO>0){
+			(sumOfSetGPIO)--;
 		}
 	}
-	if(count1>halSize){
+
+	irSensor->sumOfSetGPIO[sensorId]=sumOfSetGPIO;
+
+	if(sumOfSetGPIO>=(IRSENSOR_MAX_SAMPLE/2)){
 		irSensor->collision[sensorId]=IR_SENSOR_DETECTED_COLLISION;
 	}else{
 		irSensor->collision[sensorId]=IR_SENSOR_NOT_DETECTED_COLLISION;
 	}
 }
-void irSensorResetModeStruct(irModeStruct *mode){
-	for(int i=0;i<IRSENSOR_MAX_SAMPLE;i++){
-		mode->gpioReadPinArray[i]=0;
-	}
-	mode->countOffPin=IRSENSOR_MAX_SAMPLE;
-	mode->countOnPin=0;
-	mode->head=0;
-}
+

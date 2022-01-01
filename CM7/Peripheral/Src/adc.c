@@ -43,8 +43,23 @@ void adcSetConversionValue(uint32_t data){
 		errorCodePush(ADC_HADC_NULL_POINTER);
 		return;
 	}
-	adcBaseStructure.value=data;
-	adcBaseStructure.readyToSend=ADC_READY_TO_SEND;
+
+	if(adcBaseStructure.countMeasurement==0){
+		adcBaseStructure.meanValue=0;
+	}
+
+	if(adcBaseStructure.countMeasurement<ADC_MAX_COUNT_MEASUREMENT){
+		adcBaseStructure.meanValue+=data;
+		adcBaseStructure.countMeasurement++;
+	}
+
+	if(adcBaseStructure.countMeasurement>=ADC_MAX_COUNT_MEASUREMENT){
+		adcBaseStructure.value=adcBaseStructure.meanValue/ADC_MAX_COUNT_MEASUREMENT;
+		adcBaseStructure.readyToSend=ADC_READY_TO_SEND;
+	}else{
+		HAL_ADC_Start_IT(adcBaseStructure.hadc);
+	}
+
 }
 
 /**
@@ -126,6 +141,7 @@ uint32_t adcGetValue(){
 	if(adcBaseStructure.stage==adcSendVoltage){
 		uint32_t tempData=adcBaseStructure.value;
 		adcBaseStructure.value=ADC_WRONG_CONV;
+		adcReadyToSendData();
 		return tempData;
 	}else{
 		return ADC_WRONG_CONV;

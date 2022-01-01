@@ -16,8 +16,8 @@
 
 static const volatile servoPR_Position connectionMovementAngleArray[drivingStatusSizeFirstDimension][drivingStatusSizeSecondDimension]={
 		{servoPRPosition5,'\0'},	//IDLE_DRIVING
-		{servoPRPosition1,servoPRPosition2,servoPRPosition3,servoPRPosition4,'\0'},	//GO_UP_LEFT
-		{servoPRPosition10,servoPRPosition9,servoPRPosition8,servoPRPosition7,'\0'},	//GO_UP_RIGHT
+		{servoPRPosition10,servoPRPosition9,servoPRPosition8,servoPRPosition7,'\0'}, //GO_UP_LEFT
+		{servoPRPosition1,servoPRPosition2,servoPRPosition3,servoPRPosition4,'\0'},	//GO_UP_RIGHT
 		{servoPRPosition4,servoPRPosition5,servoPRPosition6,'\0'},	//GO_UP
 		{servoPRPosition5,'\0'},	//GO_BACK
 		{servoPRPosition11,servoPRPosition10,servoPRPosition9,'\0'},	//ROTATE_LEFT_DRIV

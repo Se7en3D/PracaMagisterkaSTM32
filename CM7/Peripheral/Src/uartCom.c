@@ -112,7 +112,9 @@ void uartComSendIrSensorStatus(uint8_t *collision,uint16_t size){
 	}
 	uartComPush(0xFF); //Początek ramki
 	uartComPush(SEND_IR_SENSOR_STATUS);
-
+	if(status>=0xFF){
+		printf("error\n");
+	}
 	if(size<=8){
 		uartComPush((uint8_t) status);
 	}else if(size<=16){
@@ -134,6 +136,9 @@ void uartComSendAdcBatteryVoltage(uint32_t value){
 		return ;
 	}
 
+	if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
+		return;
+	}
 	uartComPush(0xFF);
 	uartComPush(SEND_BATTERY_MEASURMENT_VALUE);
 	uartComPush(value>>24);
@@ -177,7 +182,6 @@ void uartComSensorInit(TIM_HandleTypeDef *htim){
 void uartComServoNextPosition(){
 	driving_structure_t  drivingStructure=stateMachineGetDrivingStructure();
 	uint32_t drivingStatus=drivingStructure.drivingStatus;
-	printf("status numer=%d pozycja=%d\n ",(int )drivingStatus,(int )uartComSensorFrame.position);
 	if(uartComSensorFrame.position<uartComArrayServoMaxMin[drivingStatus][0] || uartComSensorFrame.position>=uartComArrayServoMaxMin[drivingStatus][1]){
 		uartComSensorFrame.position=uartComArrayServoMaxMin[drivingStatus][0];
 	}

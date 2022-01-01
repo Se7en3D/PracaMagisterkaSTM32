@@ -37,6 +37,7 @@
   * @brief Stała czasowa definująca gotowość do pobrania wartości z przetwornika
   */
 #define ADC_READY_TO_SEND 3
+#define ADC_MAX_COUNT_MEASUREMENT 5 /*!<Ilość pomiarów napięcia na przetworniku potrzebne do uśrednienia wartości*/
 
 /*! Stany układu pomiarowego */
 typedef enum{
@@ -59,6 +60,8 @@ typedef struct{
 	uint32_t(*fun_ptr[4])(void); /*!< Wzkażnik na funkcję*/
 	GPIO_TypeDef *gpioPowerMeasureOn_OffPort; /*!< Wzkaznik na port odpowiedzialny za wyłączenie/włączenie zasilania */
 	uint32_t gpioPowerMeasureOn_OffPin; /*!< Numer pinu odpowiedzialnego za wyłączenie/włączenie zasilania */
+	uint8_t countMeasurement;/*!<Ilość wykonanych pomiarów adc w jednym cyklu */
+	uint32_t meanValue;/*!<Zmienna przechowująca zsumowane dane do uśrednienia*/
 }adc_Base_structure_t;
 
 volatile adc_Base_structure_t adcBaseStructure;
