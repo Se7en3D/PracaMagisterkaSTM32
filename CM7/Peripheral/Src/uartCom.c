@@ -67,6 +67,26 @@ void uartComClearFrame(){
 		uartCommunication_p->positionCommand=0;
 	}
 }
+uint8_t uartComIsFrameToDecode(){
+	if(uartCommunication_p==0){
+		return FALSE;
+	}
+	if(uartCommunication_p->detectedCommand==0){
+		return FALSE;
+	}else{
+		return TRUE;
+	}
+}
+uint8_t uartComGetFunctionFromInputFrame(){
+	if(uartCommunication_p==0){
+		return FALSE;
+	}
+	if(uartCommunication_p->detectedCommand==0){
+		return FALSE;
+	}else{
+		return uartCommunication_p->frameCommand[FUNCTIONPOSITION];
+	}
+}
 
 void uartComSendDistance(float hc5r04, uint16_t vl5310x){ //float-32bit uint16_t-16bit
 	if(uartCommunication_p==0){

@@ -250,84 +250,10 @@ Error_Handler();
   while (1){
 	  irSensorReadStatusIrSensor(); //Pobranie statusu portów czujników IR
 
-	  uint8_t* framepointer=uartComGetFrame();
-	  if(framepointer!=0){
-		  switch(framepointer[FUNCTIONPOSITION]){
-		  case RIDE_FORWARD_FUN:
-			  stateMachineDrivingForward();
-			  break;
-		  case RIDE_BACKWARD_FUN:
-			  stateMachineDrivingBack();
-			  break;
-		  case RIDE_RIGHT_FUN:
-			  stateMachineDrivingRight();
-			  break;
-		  case RIDE_LEFT_FUN:
-			  stateMachineDrivingLeft();
-			  break;
-		  case ROTATE_LEFT:
-			  stateMachineRotateLeft();
-			  break;
-		  case ROTATE_RIGHT:
-			  stateMachineRotateRight();
-			  break;
-		  case RIDE_BACKWARD_RIGHT:
-			  stateMachineRotateBackRight();
-			  break;
-		  case RIDE_BACKWARD_LEFT:
-			  stateMachineRotateBackLeft();
-			  break;
-		  case STOP_FUN:
-			  stateMachineStopDriving();
-			  break;
-		  case MEASURE_DISTANCE_FUN: //Wykonanie pomiaru odległości Brak w najnowszej wersji
-
-			  break;
-		  case CALIBRATION_PWM_DATA:
-			  //servo360NewDataPWM(framepointer);
-			  break;
-		  case UNIMPORTANT_ERROR: //Brak żadnych komend
-			  break;
-		  default:
-				  //JAKIŚ ERROR?
-				 stateMachineStopDriving();
-			  break;
-		  }
-		  uartComClearFrame();
-	  }
+	  connectionModuleDecodeMessage(&connectionBetweenServo360AndStateMachine,&drivingStructure,&servoPRGeneralStructure);
 	  connectionModuleDrivingStatusWithPositionServo(&connectionBetweenServo360AndStateMachine,&drivingStructure,&servoPRGeneralStructure);
 	  connectionModuleMeasureDistance(&servoPRGeneralStructure,&measurmentStructure);
 
-	  //driving_status_t drivingStatusTemp=stateMachineGetDrivingStructure().drivingStatus;
-	  /*if(drivingStructure.drivingStatus!=IDLE_DRIVING){
-		  if(drivingStructure.drivingStatus!=STOP_DRIVING){ //Pomiar pracy podczas jazdy
-			  //if(uartComSensorFrame.waitForData){
-				  float distanceUltra=hcsr04GetCelculatedValue();
-				  if(distanceUltra!=0.0){
-					  uint16_t distancevl5310x=vl53l0xReadRangeContinuousMillimeters();
-					  uartComSendDistanceServo(distanceUltra, distancevl5310x);
-					  //uartComServoClearWaitForData();
-				  }
-			  //}
-			  //uartComServoIsShiftPosition(); //Próba przemieszenia serwomechanizmu do następnej pozycji
-
-			  if(uartComGetMeasureForMeasureDistanceFun()!=0){
-				  uartComResetMeasureForMeasureDistanceFun();
-			  }
-		  }else{ //Pomiar dystansu na polecenie specjalne
-				float distanceUltra=hcsr04GetCelculatedValue();
-				if(distanceUltra!=0.0){
-					uint16_t distancevl5310x=vl53l0xReadRangeContinuousMillimeters();
-					uartComSendDistance(distanceUltra, distancevl5310x);
-					uartComAddMeasureForMeasureDistanceFun();
-				}
-			  if(uartComGetMeasureForMeasureDistanceFun()>MAX_MEASURMENT_SENSOR){
-				  uartComResetMeasureForMeasureDistanceFun();
-				  stateMachineMeasureDistanceEnd();
-			  }
-		  }
-
-	  }*/
 	  	 //Reset licznika od powtórzenia polecenia kierunku jazdy
 	  if(stateMachineGetResetTimer()){
 		  stateMachineResetTimer();
@@ -338,29 +264,12 @@ Error_Handler();
 		  }
 	  }
 
-
-	  //switch()
-	  //Sprawdzenie czy należy uruchomić pomiar ADC
-	  /*if(adcGetTime()>=ADC_TIME_TO_START_CONVERSION){
-		  HAL_ADC_Start_IT(&hadc1);
-		  adcClearTime();
-	  }
-
-	  //uint32_t convValue=adcGetConversionValue();
-	  if(adcReadyToSendData()==ADC_READY_TO_SEND){
-		  uint32_t value=adcGetConversionValue();
-		  uartComSendAdcBatteryVoltage(value);
-	  }*/
-
 	  switch(adcStage()){
-	 // case ADC_START_CONVERSION:
-		//  HAL_ADC_Start_IT(&hadc1);
-		//  break;
-	  case ADC_READY_TO_SEND:
-		  uartComSendAdcBatteryVoltage(adcGetValue());
-		  break;
-	  default:
-		  break;
+		  case ADC_READY_TO_SEND:
+			  uartComSendAdcBatteryVoltage(adcGetValue());
+			  break;
+		  default:
+			  break;
 	  }
 
 

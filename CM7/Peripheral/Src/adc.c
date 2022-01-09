@@ -54,12 +54,10 @@ void adcSetConversionValue(uint32_t data){
 	}
 
 	if(adcBaseStructure.countMeasurement>=ADC_MAX_COUNT_MEASUREMENT){
+		adcBaseStructure.countMeasurement=0;
 		adcBaseStructure.value=adcBaseStructure.meanValue/ADC_MAX_COUNT_MEASUREMENT;
 		adcBaseStructure.readyToSend=ADC_READY_TO_SEND;
-	}else{
-		HAL_ADC_Start_IT(adcBaseStructure.hadc);
 	}
-
 }
 
 /**
@@ -69,7 +67,7 @@ void adcSetConversionValue(uint32_t data){
   * @retval ADC_TURN_ON_POWER informująca o potrzebie załączenia zasilania.
   * 		ADC_NOT_REACTION brak reakcji
   */
-uint32_t adcTurnOnPowerOptocoupler(){ //Funkcja przygotowująca do załączenia zasilania
+uint32_t adcTurnOnPowerOptocoupler(){
 	if(adcBaseStructure.time>=ADC_TIME_TO_START_CONVERSION){
 		adcBaseStructure.time=0;
 		adcBaseStructure.stage=adcWaitoForStabilizeVoltage;
@@ -86,7 +84,7 @@ uint32_t adcTurnOnPowerOptocoupler(){ //Funkcja przygotowująca do załączenia 
   * @retval ADC_START_CONVERSION załączenie pomiaru napięcia.
   * 		ADC_NOT_REACTION brak reakcji
   */
-uint32_t adcWaitForStabilizeVoltage(){ //Funkcja oczekiwania na załączenie przetwornika ADC
+uint32_t adcWaitForStabilizeVoltage(){
 	if(adcBaseStructure.time>=ADC_TIME_TO_STABILIZE_VOLTAGE){
 		adcBaseStructure.time=0;
 		adcBaseStructure.stage=adcMeasureVoltage;
@@ -103,6 +101,10 @@ uint32_t adcWaitForStabilizeVoltage(){ //Funkcja oczekiwania na załączenie prz
   * 		ADC_NOT_REACTION brak reakcji
   */
 uint32_t adcWaitForConversionValue(){
+	if(HAL_ADC_GetState(adcBaseStructure.hadc)!=HAL_ADC_STATE_READY){
+		HAL_ADC_Start_IT(adcBaseStructure.hadc);
+	}
+
 	if(adcBaseStructure.value!=ADC_WRONG_CONV){
 		adcBaseStructure.stage=adcSendVoltage;
 		return ADC_READY_TO_SEND;

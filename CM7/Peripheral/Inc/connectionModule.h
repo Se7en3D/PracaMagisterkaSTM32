@@ -48,6 +48,7 @@ typedef struct{
 }connectionBetweenServo360AndStateMachine_t;
 
 connectionBetweenServo360AndStateMachine_t  connectionBetweenServo360AndStateMachine;
+void connectionModuleDecodeMessage(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR);
 void connectionModuleDrivingStatusWithPositionServo(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR);
 void connectionModuleaddTimeout(measurmentStructure_t *measureS);
 void connectionModuleMeasureDistance(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
