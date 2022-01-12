@@ -37,6 +37,7 @@ typedef struct{
 	uint16_t htimPeriod;
 	uint16_t htimFullPulse;
 	uint16_t htimHalfPulse;
+	uint8_t stopManualDriving;
 }driving_structure_t;
 
 driving_structure_t drivingStructure;
@@ -62,4 +63,6 @@ uint32_t stateMachineGetResetTimer();
 void stateMachineSetHtimCompare(uint16_t htimChannel1,uint16_t htimChannel2);
 driving_structure_t stateMachineGetDrivingStructure();
 uint8_t stateMachineDrabingsStatusIsEqual(driving_structure_t *drivingStatus);
+void stateMachineSetStopManualDriving();
+void stateMachineResetStopManualDriving();
 #endif /* INC_STATEMACHINE_H_ */

@@ -13,6 +13,7 @@
 #include "connectionModule.h"
 #include "hc-sr04.h"
 #include "vl5310x.h"
+#include "irSensor.h"
 
 static const volatile servoPR_Position connectionMovementAngleArray[drivingStatusSizeFirstDimension][drivingStatusSizeSecondDimension]={
 		{servoPRPosition5,'\0'},	/*IDLE_DRIVING*/
@@ -36,8 +37,11 @@ static void (*measurmentStatusFunction[measurmentStatusFunctionArreySize])(servo
 void connectionModuleDecodeMessage(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR){
 	if(uartComIsFrameToDecode()){
 		  uint8_t function=uartComGetFunctionFromInputFrame();
-		  uint8_t collision=irSensorGetHexValueFromAllCollision();
-
+		  /*if(connectionModuleCheckCollisionByIrSensor(function)){
+			  stateMachineSetStopManualDriving();
+		  }else{
+			  stateMachineResetStopManualDriving();
+		  }*/
 		  switch(function){
 			  case RIDE_FORWARD_FUN:/*Jazda w kierunku do przodu*/
 				  stateMachineDrivingForward();
@@ -194,5 +198,41 @@ void connectionModuleClearMeasurmentStatus(measurmentStructure_t *measurmentStru
 	measurmentStructure->isDistanceVl5310xLock=connectionModuleUnlockDistance;
 	measurmentStructure->timeout=0;
 	measurmentStructure->measurmentStatus=connectionModuleMeasurment_Idle;
+}
+
+uint8_t connectionModuleCheckCollisionByIrSensor(const uint8_t function){
+	uint8_t collision=irSensorGetHexValueFromAllCollision();
+	uint8_t mask=0x00;
+	switch(function){
+			  case RIDE_FORWARD_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1|IR_SENSOR_MASK_FOR_IR_NR2|IR_SENSOR_MASK_FOR_IR_NR3);
+				  break;
+			  case RIDE_BACKWARD_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR6|IR_SENSOR_MASK_FOR_IR_NR7);
+				  break;
+			  case RIDE_RIGHT_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR2|IR_SENSOR_MASK_FOR_IR_NR3);
+				  break;
+			  case RIDE_LEFT_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1|IR_SENSOR_MASK_FOR_IR_NR2);
+				  break;
+			  case ROTATE_LEFT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR3);
+				  break;
+			  case ROTATE_RIGHT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1);
+				  break;
+			  case RIDE_BACKWARD_RIGHT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR7);
+				  break;
+			  case RIDE_BACKWARD_LEFT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR6);
+				  break;
+	}
+	if((collision&mask)==0x00){
+		return FALSE;
+	}else{
+		return TRUE;
+	}
 }
 

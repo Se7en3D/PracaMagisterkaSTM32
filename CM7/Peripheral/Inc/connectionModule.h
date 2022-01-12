@@ -56,3 +56,4 @@ void connectrionModuleFunctionMeasurmentIdle(servoPR_GeneralStructure * servoPR,
 void connectionModuleFunctionMeasurmentWait(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
 void connectionModuleFunctionMeasurmentSend(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
 void connectionModuleClearMeasurmentStatus(measurmentStructure_t *measurmentStructure);
+uint8_t connectionModuleCheckCollisionByIrSensor(const uint8_t function);

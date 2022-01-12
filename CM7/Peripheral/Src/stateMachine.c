@@ -130,6 +130,7 @@ void stateMachineMeasureDistanceEnd(){
 
 void stateMachineTimeout(){
 	drivingStructure.drivingStatus=IDLE_DRIVING;
+	drivingStructure.stopManualDriving=RESET;
 	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET);
 	stateMachineSetHtimCompare(drivingStructure.htimFullPulse,drivingStructure.htimFullPulse);
 	errorCodePush(STATEMACHINE_TIMEOUT);
@@ -140,6 +141,9 @@ void stateMachineResetTimer(){
 
 void stateMachineSetOutput(GPIO_PinState A1,GPIO_PinState A2,GPIO_PinState B1,GPIO_PinState B2){
 	if(drivingStructure.GPIOOUT!=0){
+		if(drivingStructure.stopManualDriving==SET){
+			return;
+		}
 		HAL_GPIO_WritePin(drivingStructure.GPIOOUT, drivingStructure.L298NOUT1A, A1);
 		HAL_GPIO_WritePin(drivingStructure.GPIOOUT, drivingStructure.L298NOUT2A, A2);
 		HAL_GPIO_WritePin(drivingStructure.GPIOOUT, drivingStructure.L298NOUT1B, B1);
@@ -183,5 +187,15 @@ uint8_t stateMachineDrabingsStatusIsEqual(driving_structure_t *drivingStatus){
 
 driving_status_t stateMachineGetDrivingStatus(driving_structure_t *drivingStructure){
 	return drivingStructure->drivingStatus;
+}
+
+void stateMachineSetStopManualDriving(){
+	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET);
+	drivingStructure.stopManualDriving=SET;
+}
+
+void stateMachineResetStopManualDriving(){
+	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET);
+	drivingStructure.stopManualDriving=RESET;
 }
 
