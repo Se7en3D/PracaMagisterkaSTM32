@@ -144,6 +144,7 @@ void stateMachineSetOutput(GPIO_PinState A1,GPIO_PinState A2,GPIO_PinState B1,GP
 		if(drivingStructure.stopManualDriving==SET){
 			return;
 		}
+		printf("Ustawiono A1=%d A2=%d B1=%d B2=%d\n",(int)A1,(int)A2,(int) B1,(int)B2);
 		HAL_GPIO_WritePin(drivingStructure.GPIOOUT, drivingStructure.L298NOUT1A, A1);
 		HAL_GPIO_WritePin(drivingStructure.GPIOOUT, drivingStructure.L298NOUT2A, A2);
 		HAL_GPIO_WritePin(drivingStructure.GPIOOUT, drivingStructure.L298NOUT1B, B1);
@@ -190,12 +191,17 @@ driving_status_t stateMachineGetDrivingStatus(driving_structure_t *drivingStruct
 }
 
 void stateMachineSetStopManualDriving(){
-	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET);
+	if(drivingStructure.stopManualDriving==RESET){
+		stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET);
+	}
 	drivingStructure.stopManualDriving=SET;
 }
 
 void stateMachineResetStopManualDriving(){
-	stateMachineSetOutput(GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET,GPIO_PIN_RESET);
+	if(drivingStructure.stopManualDriving==SET){ //Wymagane żeby ustawić wyjścia silnika po usunięcia przeszkody z czujników IR
+		drivingStructure.previousDrivingStatus=IDLE_DRIVING;
+		drivingStructure.drivingStatus=IDLE_DRIVING;
+	}
 	drivingStructure.stopManualDriving=RESET;
 }
 

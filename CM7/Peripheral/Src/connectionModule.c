@@ -37,11 +37,11 @@ static void (*measurmentStatusFunction[measurmentStatusFunctionArreySize])(servo
 void connectionModuleDecodeMessage(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR){
 	if(uartComIsFrameToDecode()){
 		  uint8_t function=uartComGetFunctionFromInputFrame();
-		  /*if(connectionModuleCheckCollisionByIrSensor(function)){
+		  if(connectionModuleCheckCollisionByIrSensor(function)){
 			  stateMachineSetStopManualDriving();
 		  }else{
 			  stateMachineResetStopManualDriving();
-		  }*/
+		  }
 		  switch(function){
 			  case RIDE_FORWARD_FUN:/*Jazda w kierunku do przodu*/
 				  stateMachineDrivingForward();
@@ -211,10 +211,10 @@ uint8_t connectionModuleCheckCollisionByIrSensor(const uint8_t function){
 				  mask|=(IR_SENSOR_MASK_FOR_IR_NR6|IR_SENSOR_MASK_FOR_IR_NR7);
 				  break;
 			  case RIDE_RIGHT_FUN:
-				  mask|=(IR_SENSOR_MASK_FOR_IR_NR2|IR_SENSOR_MASK_FOR_IR_NR3);
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1|IR_SENSOR_MASK_FOR_IR_NR2);
 				  break;
 			  case RIDE_LEFT_FUN:
-				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1|IR_SENSOR_MASK_FOR_IR_NR2);
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR2|IR_SENSOR_MASK_FOR_IR_NR3);
 				  break;
 			  case ROTATE_LEFT:
 				  mask|=(IR_SENSOR_MASK_FOR_IR_NR3);

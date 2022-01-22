@@ -36,7 +36,7 @@
 #define	IRSENSOR_COLLISION_NEGATION 0
 #define IRSENSOR_MAX_SAMPLE 5 //Maksymalna wielkość tablicy pobierającej stany wejścia pinu potrzebna do określania dominanty
 
-volatile static int IrSensorExist[MAX_SENSOR_IR]={
+volatile static uint8_t IrSensorExist[MAX_SENSOR_IR]={
 		IR_SENSOR_EXIST,
 		IR_SENSOR_EXIST,
 		IR_SENSOR_EXIST,

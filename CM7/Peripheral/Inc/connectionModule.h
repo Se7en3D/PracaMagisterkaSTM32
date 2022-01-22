@@ -38,10 +38,10 @@ typedef struct{
 	uint8_t isDistanceVl5310xLock;
 	int timeout;
 	connectionModuleMeasurmentStatus measurmentStatus;
-
 }measurmentStructure_t;
 
 measurmentStructure_t measurmentStructure;
+
 typedef struct{
 	uint8_t numberForTabPositionByDriving;
 	int adder;

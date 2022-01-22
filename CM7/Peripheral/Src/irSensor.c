@@ -90,7 +90,7 @@ uint32_t irSensorGetHexValueFromAllCollision(){
 	uint32_t value=0;
 	for(int i=0;i<MAX_SENSOR_IR;i++){
 		if(irSensor.collision[i]){
-			value+=2*i;
+			value|=(1<<i);
 		}
 	}
 	return value;
