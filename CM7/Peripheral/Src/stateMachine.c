@@ -205,3 +205,12 @@ void stateMachineResetStopManualDriving(){
 	drivingStructure.stopManualDriving=RESET;
 }
 
+uint8_t stateMachineIsManualDriving(){
+	if(drivingStructure.stopManualDriving==SET){
+		return TRUE;
+	}else{
+		return FALSE;
+	}
+}
+
+

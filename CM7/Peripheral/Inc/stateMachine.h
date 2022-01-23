@@ -65,4 +65,5 @@ driving_structure_t stateMachineGetDrivingStructure();
 uint8_t stateMachineDrabingsStatusIsEqual(driving_structure_t *drivingStatus);
 void stateMachineSetStopManualDriving();
 void stateMachineResetStopManualDriving();
+uint8_t stateMachineIsManualDriving();
 #endif /* INC_STATEMACHINE_H_ */

@@ -89,6 +89,9 @@ void connectionModuleDecodeMessage(connectionBetweenServo360AndStateMachine_t *s
 
 void connectionModuleDrivingStatusWithPositionServo(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR){
 	if(servoPRReadyToChangeAngle(servoPR)){
+		if(stateMachineIsManualDriving()){
+			return;
+		}
 		uint8_t positionFirstDimension=stateMachineGetDrivingStatus(drivingStructure);
 		uint8_t positionSecondDimension=servoAndStateMachine->numberForTabPositionByDriving;
 		if(stateMachineDrabingsStatusIsEqual(drivingStructure)){

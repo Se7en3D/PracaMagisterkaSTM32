@@ -33,7 +33,7 @@
 #define IR_SENSOR_EXIST 1
 #define TIME_TO_SEND_STATUS_IR 500 //czas(ms) do wysłania statusu od sensorów podczerwieni
 #define IRSENSOR_TIME_TO_READ_GPIO 10
-#define	IRSENSOR_COLLISION_NEGATION 0
+#define	IRSENSOR_COLLISION_NEGATION 1
 #define IRSENSOR_MAX_SAMPLE 5 //Maksymalna wielkość tablicy pobierającej stany wejścia pinu potrzebna do określania dominanty
 
 volatile static uint8_t IrSensorExist[MAX_SENSOR_IR]={
