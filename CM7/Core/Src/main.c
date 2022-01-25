@@ -25,7 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
-#include "CircularBuffer.h"
+#include "Car.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,15 +113,7 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int __io_putchar(int ch)
-{
-  if (ch == '\n') {
-    __io_putchar('\r');
-  }
 
-  //TODO Dodać komendę do wysyłania odpowiedzi poprzez Bluetooth
-  return 1;
-}
 /* USER CODE END 0 */
 
 /**
@@ -195,11 +187,13 @@ Error_Handler();
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+  Car_Create(&huart4);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
+	  mainFun();
 	/* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -903,20 +897,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 
-}
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle){
-
-}
-
-void HAL_I2C_MasterRxCpltCallback (I2C_HandleTypeDef * hi2c){
-
-}
-
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-
-}
 /* USER CODE END 4 */
 
 /**
