@@ -24,7 +24,7 @@ void Message_Init(messageStruct* const me,
 		void(*Insert)(messageStruct* const me,uint8_t data),
 		void(*InsertError)(messageStruct* const me,uint8_t data),
 		void(*InsertDistance)(messageStruct* const me,float  hcSr04,uint16_t vl53l0x),
-		void(*InsertIrSensor)(messageStruct* const me,uint8_t  *collision,uint16_t size),
+		void(*InsertIrSensor)(messageStruct* const me,uint32_t value),
 		void(*InsertAdcBatteryVoltage)(messageStruct* const me,uint32_t value),
 		void(*SendMessage)(messageStruct* const me)){
 	me->buffer=CircularBuffer_Create();
@@ -59,8 +59,10 @@ void Message_InsertDistance(messageStruct* const me,float  hcSr04,uint16_t vl53l
 	me->buffer->insert(me->buffer,0xFE);
 	me->buffer->insert(me->buffer,0xFE);
 }
-void Message_InsertIrSensor(messageStruct* const me,uint8_t  *collision,uint16_t size){
+void Message_InsertIrSensor(messageStruct* const me,uint32_t value){
 
+
+	/*
 	uint32_t status=0;
 	if(size>32){
 			//TODO Error dla przekroczenia wielkości
@@ -88,6 +90,12 @@ void Message_InsertIrSensor(messageStruct* const me,uint8_t  *collision,uint16_t
 		me->buffer->insert(me->buffer,(uint8_t) status);
 	}
 
+	me->buffer->insert(me->buffer,0xFE);
+	me->buffer->insert(me->buffer,0xFE);*/
+
+	me->buffer->insert(me->buffer,0xFF); //Początek ramki
+	me->buffer->insert(me->buffer,SEND_IR_SENSOR_STATUS);
+	me->buffer->insert(me->buffer,(uint8_t)value);
 	me->buffer->insert(me->buffer,0xFE);
 	me->buffer->insert(me->buffer,0xFE);
 }

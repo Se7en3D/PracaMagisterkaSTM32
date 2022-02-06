@@ -16,7 +16,7 @@ struct messageStruct{
 	void(*Insert)(messageStruct* const me,uint8_t data);
 	void(*InsertError)(messageStruct* const me,uint8_t data);
 	void(*InsertDistance)(messageStruct* const me,float  hcSr04,uint16_t vl53l0x);
-	void(*InsertIrSensor)(messageStruct* const me,uint8_t  *collision,uint16_t size);
+	void(*InsertIrSensor)(messageStruct* const me,uint32_t value);
 	void(*InsertAdcBatteryVoltage)(messageStruct* const me,uint32_t value);
 	void(*SendMessage)(messageStruct* const me);
 };
@@ -26,13 +26,13 @@ void Message_Init(messageStruct* const me,
 		void(*Insert)(messageStruct* const me,uint8_t data),
 		void(*InsertError)(messageStruct* const me,uint8_t data),
 		void(*InsertDistance)(messageStruct* const me,float  hcSr04,uint16_t vl53l0x),
-		void(*InsertIrSensor)(messageStruct* const me,uint8_t  *collision,uint16_t size),
+		void(*InsertIrSensor)(messageStruct* const me,uint32_t value),
 		void(*InsertAdcBatteryVoltage)(messageStruct* const me,uint32_t value),
 		void(*SendMessage)(messageStruct* const me));
 
 void Message_Insert(messageStruct* const me,uint8_t data);
 void Message_InsertError(messageStruct* const me,uint8_t data);
 void Message_InsertDistance(messageStruct* const me,float  hcSr04,uint16_t vl53l0x);
-void Message_InsertIrSensor(messageStruct* const me,uint8_t  *collision,uint16_t size);
+void Message_InsertIrSensor(messageStruct* const me,uint32_t value);
 void Message_InsertAdcBatteryVoltage(messageStruct* const me,uint32_t value);
 void Message_SendMessage(messageStruct* const me);

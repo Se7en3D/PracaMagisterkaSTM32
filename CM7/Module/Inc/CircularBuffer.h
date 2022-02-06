@@ -1,4 +1,4 @@
-#define CIRCULARBUFFER_MAX_SIZE_BUFFER 100
+#define CIRCULARBUFFER_MAX_SIZE_BUFFER 500
 #define circ_t  uint8_t /*!<Typ danych przechowywany w buforze*/
 typedef struct CircularBufferStruct CircularBufferStruct;
 
