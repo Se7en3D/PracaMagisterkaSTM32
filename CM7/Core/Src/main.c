@@ -201,6 +201,11 @@ Error_Handler();
   Car_AddIrSensor(IR_NR_6_GPIO_Port,IR_NR_6_Pin);
   Car_AddIrSensor(IR_NR_7_GPIO_Port,IR_NR_7_Pin);
   Car_AddIrSensor(IR_NR_8_GPIO_Port,IR_NR_8_Pin);
+
+	HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+	HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */

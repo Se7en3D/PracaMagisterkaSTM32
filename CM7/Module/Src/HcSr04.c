@@ -105,15 +105,15 @@ void HcSr04_htimInterrupt(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim){
 		}
 }
 void HcSr04_HalStart(TIM_HandleTypeDef *htim){
-	HAL_TIM_IC_Start(htim, TIM_CHANNEL_1);
+	/*HAL_TIM_IC_Start(htim, TIM_CHANNEL_1);
 	HAL_TIM_IC_Start(htim, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3);
-	HAL_TIM_Base_Start_IT(htim);
+	HAL_TIM_Base_Start_IT(htim);*/
 }
 void HcSr04_HalStop(TIM_HandleTypeDef *htim){
-	HAL_TIM_Base_Stop_IT(htim);
+	/*HAL_TIM_Base_Stop_IT(htim);
 	HAL_TIM_IC_Stop(htim, TIM_CHANNEL_1);
 	HAL_TIM_IC_Stop(htim, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Stop(htim, TIM_CHANNEL_3);
-	__HAL_TIM_SET_COUNTER(htim,0);
+	__HAL_TIM_SET_COUNTER(htim,0);*/
 }
