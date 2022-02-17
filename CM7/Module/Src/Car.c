@@ -9,13 +9,17 @@ void Car_Create(UART_HandleTypeDef *Message_huart,
 		TIM_HandleTypeDef* timerHcSr04,
 		ADC_HandleTypeDef* adcBattery,
 		GPIO_TypeDef* gpioBattery,
-		uint16_t pinBattery){
+		uint16_t pinBattery,
+		I2C_HandleTypeDef * hi2cVl53l0,
+		GPIO_TypeDef *xshutgpio,
+		uint16_t xshutpin){
 	generalCarModule.inMessage=CommandDecoder_Create();
 	generalCarModule.outMessage=Message_Create(Message_huart);
 	generalCarModule.batteryVoltage=BatteryVoltage_Create(adcBattery, gpioBattery, pinBattery);
 	generalCarModule.irSensor=IrSensor_Create();
 	generalCarModule.HcSr04=HcSr04_Create(timerHcSr04);
 	generalCarModule.timer1ms=timer1ms;
+	generalCarModule.vl53l0x=vl53l0x_Create(hi2cVl53l0,xshutgpio,xshutpin);
 	//generalCarModule.batteryVoltage->setContinousMeasurment(generalCarModule.batteryVoltage);
 	/*HAL Start Per*/
 	HAL_UART_Receive_IT(Message_huart,&generalCarModule.ReceivedInMessageBuff,1);
@@ -36,8 +40,10 @@ void mainFun(){
 
 
 		//TODO usunąc czujnik HCsr04 stąd
-		uint32_t HcSr04Result=generalCarModule.HcSr04->getMeasurment(generalCarModule.HcSr04);
-		printf("HC-SR04 wynik=%d\n",(int)HcSr04Result);
+		/*uint32_t HcSr04Result=vl53l0x_ReadDistance(generalCarModule.vl53l0x);
+		printf("Dystans=%d\n",(int)HcSr04Result);*/
+		generalCarModule.vl53l0x->startSingleMeasurment(generalCarModule.vl53l0x);
+
 
 	}
 	uint32_t *pointerToValueFromAdc=generalCarModule.batteryVoltage->getValue(generalCarModule.batteryVoltage);
@@ -50,6 +56,11 @@ void mainFun(){
 		uint32_t IrSensorValue=generalCarModule.irSensor->getValue(generalCarModule.irSensor);
 		generalCarModule.outMessage->InsertIrSensor(generalCarModule.outMessage,IrSensorValue);
 		generalCarModule.timerToSendIrSensorStatus=0;
+	}
+		/*Obsługa modułu vl53lx0		 */
+	uint16_t *vl53lx0_Distance=generalCarModule.vl53l0x->getDistance(generalCarModule.vl53l0x);
+	if(vl53lx0_Distance){
+		printf("vl53l0x dystans=%d\n",(int)(*vl53lx0_Distance));
 	}
 					/*Testowanie czujnika odległości HcSr04 */
 	generalCarModule.HcSr04->startMeasurment(generalCarModule.HcSr04);
@@ -79,6 +90,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 		generalCarModule.batteryVoltage->addTime(generalCarModule.batteryVoltage);
 		generalCarModule.timerMeasureBatteryVoltage++;
 		generalCarModule.timerToSendIrSensorStatus++;
+		generalCarModule.vl53l0x->increaseTime(generalCarModule.vl53l0x);
 		/*
 		irSensorAddTime();
 		adcAddTime();

@@ -192,7 +192,10 @@ Error_Handler();
 		  &htim2,
 		  &hadc1,
 		  OPTOCOUPLER_POWER_ON_GPIO_Port,
-		  OPTOCOUPLER_POWER_ON_Pin);
+		  OPTOCOUPLER_POWER_ON_Pin,
+		  &hi2c1,
+		  VL53L0X_XSHUT_GPIO_Port,
+		  VL53L0X_XSHUT_Pin);
   Car_AddIrSensor(IR_NR_1_GPIO_Port,IR_NR_1_Pin);
   Car_AddIrSensor(IR_NR_2_GPIO_Port,IR_NR_2_Pin);
   Car_AddIrSensor(IR_NR_3_GPIO_Port,IR_NR_3_Pin);
@@ -201,11 +204,6 @@ Error_Handler();
   Car_AddIrSensor(IR_NR_6_GPIO_Port,IR_NR_6_Pin);
   Car_AddIrSensor(IR_NR_7_GPIO_Port,IR_NR_7_Pin);
   Car_AddIrSensor(IR_NR_8_GPIO_Port,IR_NR_8_Pin);
-
-	HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
-	HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_2);
-	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
-	HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -517,6 +515,12 @@ static void MX_TIM2_Init(void)
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+  sConfigIC.ICSelection = TIM_ICSELECTION_INDIRECTTI;
+  if (HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }

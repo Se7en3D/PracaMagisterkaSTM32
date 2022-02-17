@@ -117,7 +117,7 @@ void Message_SendMessage(messageStruct* const me){
 	  if(hdma_uart4_tx->State==HAL_DMA_STATE_READY){
 		  uint32_t uartBufferLength=me->buffer->getSize(me->buffer);
 		  if(uartBufferLength){
-			  uint8_t *uartBufferPointer=me->buffer->getDataToDMA(me->buffer);
+			  uint8_t *uartBufferPointer=me->buffer->getDataFromDMA(me->buffer);
 			  HAL_UART_Transmit_DMA(me->huart, uartBufferPointer, uartBufferLength);
 		  }
 	  }
