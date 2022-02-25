@@ -28,10 +28,11 @@ struct ultrasonicSensorStruct{
 	void (*addFallingEdgeTime)(ultrasonicSensorStruct *me, uint32_t value);
 	void (*setContinousMeasurment)(ultrasonicSensorStruct *me);
 	void (*resetContinousMeasurment)(ultrasonicSensorStruct *me);
-	uint32_t(*getMeasurment)(ultrasonicSensorStruct *me);
+	uint32_t*(*getMeasurment)(ultrasonicSensorStruct *me);
 	void (*resetMeasurment)(ultrasonicSensorStruct *me);
 	void (*startMeasurment)(ultrasonicSensorStruct *me);
 	void (*htimInterrupt)(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim);
+	uint8_t (*isReady)(ultrasonicSensorStruct *me);
 };
 
 
@@ -41,18 +42,20 @@ void HcSr04_Init(ultrasonicSensorStruct *me,
 				void (*addFallingEdgeTime)(ultrasonicSensorStruct *me, uint32_t value),
 				void (*setContinousMeasurment)(ultrasonicSensorStruct *me),
 				void (*resetContinousMeasurment)(ultrasonicSensorStruct *me),
-				uint32_t(*getMeasurment)(ultrasonicSensorStruct *me),
+				uint32_t*(*getMeasurment)(ultrasonicSensorStruct *me),
 				void (*resetMeasurment)(ultrasonicSensorStruct *me),
 				void (*startMeasurment)(ultrasonicSensorStruct *me),
-				void (*htimInterrupt)(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim));
+				void (*htimInterrupt)(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim),
+				uint8_t (*isReady)(ultrasonicSensorStruct *me));
 void HcSr04_AddRisingEdgeTime(ultrasonicSensorStruct *me, uint32_t value);
 void HcSr04_AddFallingEdgeTime(ultrasonicSensorStruct *me, uint32_t value);
 void HcSr04_SetContinousMeasurment(ultrasonicSensorStruct *me);
 void HcSr04_ResetContinousMeasurment(ultrasonicSensorStruct *me);
-uint32_t HcSr04_GetMeasurment(ultrasonicSensorStruct *me);
+uint32_t* HcSr04_GetMeasurment(ultrasonicSensorStruct *me);
 void HcSr04_ResetMeasurment(ultrasonicSensorStruct *me);
 void HcSr04_StartMeasurment(ultrasonicSensorStruct *me);
 void HcSr04_htimInterrupt(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim);
 void HcSr04_HalStart(TIM_HandleTypeDef *htim);
 void HcSr04_HalStop(TIM_HandleTypeDef *htim);
+uint8_t HcSr04_IsReady(ultrasonicSensorStruct *me);
 #endif /* INC_HCSR04_H_ */

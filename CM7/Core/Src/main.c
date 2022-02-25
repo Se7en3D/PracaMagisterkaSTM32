@@ -187,7 +187,7 @@ Error_Handler();
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  Car_Create(&huart4,
+  /*Car_Create(&huart4,
 		  &htim7,
 		  &htim2,
 		  &hadc1,
@@ -195,7 +195,9 @@ Error_Handler();
 		  OPTOCOUPLER_POWER_ON_Pin,
 		  &hi2c1,
 		  VL53L0X_XSHUT_GPIO_Port,
-		  VL53L0X_XSHUT_Pin);
+		  VL53L0X_XSHUT_Pin,
+		  &htim13,
+		  TIM_CHANNEL_1);
   Car_AddIrSensor(IR_NR_1_GPIO_Port,IR_NR_1_Pin);
   Car_AddIrSensor(IR_NR_2_GPIO_Port,IR_NR_2_Pin);
   Car_AddIrSensor(IR_NR_3_GPIO_Port,IR_NR_3_Pin);
@@ -203,13 +205,47 @@ Error_Handler();
   Car_AddIrSensor(IR_NR_5_GPIO_Port,IR_NR_5_Pin);
   Car_AddIrSensor(IR_NR_6_GPIO_Port,IR_NR_6_Pin);
   Car_AddIrSensor(IR_NR_7_GPIO_Port,IR_NR_7_Pin);
-  Car_AddIrSensor(IR_NR_8_GPIO_Port,IR_NR_8_Pin);
+  Car_AddIrSensor(IR_NR_8_GPIO_Port,IR_NR_8_Pin);*/
+  CarTestModule=Car_Create(&htim7);
+  if(CarTestModule!=NULL){
+	  CarTestModule->createOutMessage(CarTestModule,
+			  	  	  	  	  	  	  &huart4);
+	  CarTestModule->createInMessage(CarTestModule);
+	  CarTestModule->createBatteryVoltage(CarTestModule,
+			  	  	  	  	  	  	  	  &hadc1,
+										  OPTOCOUPLER_POWER_ON_GPIO_Port,
+										  OPTOCOUPLER_POWER_ON_Pin);
+	  CarTestModule->createServoPR(CarTestModule,
+			  	  	  	  	  	  &htim13,
+								  TIM_CHANNEL_1);
+	  CarTestModule->createHcSr04(CarTestModule,
+			  	  	  	  	  	  &htim2);
+	  CarTestModule->createVl54l0x(CarTestModule,
+			  	  	  	  	  	  	 &hi2c1,
+									 VL53L0X_XSHUT_GPIO_Port,
+									 VL53L0X_XSHUT_Pin);
+	  CarTestModule->createIrSensor(CarTestModule);
+	  CarTestModule->createMotorControl(CarTestModule,GPIOE,GPIO_PIN_3,GPIO_PIN_2,GPIO_PIN_5,GPIO_PIN_4,&htim12,TIM_CHANNEL_1,TIM_CHANNEL_2);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_1_GPIO_Port,IR_NR_1_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_2_GPIO_Port,IR_NR_2_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_3_GPIO_Port,IR_NR_3_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_4_GPIO_Port,IR_NR_4_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_5_GPIO_Port,IR_NR_5_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_6_GPIO_Port,IR_NR_6_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_7_GPIO_Port,IR_NR_7_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_8_GPIO_Port,IR_NR_8_Pin);
+	  HAL_TIM_Base_Start_IT(&htim7);
+  }else{
+	  while(1){
+
+	  }
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
-	  mainFun();
+	  Car_mainFun(CarTestModule);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

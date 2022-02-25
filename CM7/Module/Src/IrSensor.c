@@ -4,11 +4,11 @@
  *  Created on: 31 sty 2022
  *      Author: Daniel
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "stm32h7xx_hal.h"
-#include "irSensor.h"
-
+#include "IrSensor.h"
 irSensorStruct* IrSensor_Create(){
 	irSensorStruct *me=malloc(sizeof(irSensorStruct));
 	if(me!=NULL){
@@ -49,12 +49,12 @@ void IrSensor_ReadGPIO(irSensorStruct* const me){
 	}
 }
 uint32_t IrSensor_GetValueGPIO(irSensorStruct* const me){
-	uint32_t value=0;
+	uint32_t value=0xFF;
 	linkListGPIO *linkList=me->first;
 	uint32_t i=0;
 	while(linkList!=NULL){
 		if(linkList->value>=(IRSENSOR_MAX_ON_VALUE/2)){
-			value|=(1<<i);
+			value&=~(1<<i);
 		}
 		i++;
 		linkList=linkList->next;
@@ -71,7 +71,7 @@ uint32_t IrSensor_GetSize(irSensorStruct* const me){
 	return i;
 }
 void IRSensor_AddGPIO(irSensorStruct* const me, GPIO_TypeDef *gpio, uint16_t pin){
-	linkListGPIO *next=malloc(sizeof(linkListGPIO));
+	linkListGPIO *next=(linkListGPIO*) malloc(sizeof(linkListGPIO));
 	next->gpio=gpio;
 	next->pin=pin;
 	next->value=0;

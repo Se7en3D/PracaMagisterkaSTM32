@@ -26,7 +26,9 @@ ultrasonicSensorStruct* HcSr04_Create(TIM_HandleTypeDef *htim){
 				HcSr04_GetMeasurment,
 				HcSr04_ResetMeasurment,
 				HcSr04_StartMeasurment,
-				HcSr04_htimInterrupt);
+				HcSr04_htimInterrupt,
+				HcSr04_IsReady);
+
 	}
 	return me;
 }
@@ -35,10 +37,11 @@ void HcSr04_Init(ultrasonicSensorStruct *me,
 				void (*addFallingEdgeTime)(ultrasonicSensorStruct *me, uint32_t value),
 				void (*setContinousMeasurment)(ultrasonicSensorStruct *me),
 				void (*resetContinousMeasurment)(ultrasonicSensorStruct *me),
-				uint32_t(*getMeasurment)(ultrasonicSensorStruct *me),
+				uint32_t*(*getMeasurment)(ultrasonicSensorStruct *me),
 				void (*resetMeasurment)(ultrasonicSensorStruct *me),
 				void (*startMeasurment)(ultrasonicSensorStruct *me),
-				void (*htimInterrupt)(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim)){
+				void (*htimInterrupt)(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim),
+				uint8_t (*isReady)(ultrasonicSensorStruct *me)){
 	me->addRisingEdgeTime=addRisingEdgeTime;
 	me->addFallingEdgeTime=addFallingEdgeTime;
 	me->setContinousMeasurment=setContinousMeasurment;
@@ -47,6 +50,7 @@ void HcSr04_Init(ultrasonicSensorStruct *me,
 	me->resetMeasurment=resetMeasurment;
 	me->startMeasurment=startMeasurment;
 	me->htimInterrupt=htimInterrupt;
+	me->isReady=isReady;
 
 }
 void HcSr04_AddRisingEdgeTime(ultrasonicSensorStruct *me, uint32_t value){
@@ -68,15 +72,16 @@ void HcSr04_SetContinousMeasurment(ultrasonicSensorStruct *me){
 void HcSr04_ResetContinousMeasurment(ultrasonicSensorStruct *me){
 	me->continousMeasurment=RESET;
 }
-uint32_t HcSr04_GetMeasurment(ultrasonicSensorStruct *me){
+uint32_t* HcSr04_GetMeasurment(ultrasonicSensorStruct *me){
 	if(me->status==HCSR04_CompleteMeasurment){
 		me->result=me->fallingEdgeTime-me->risingEdgeTime;
 		me->status=HCSR04_Idle;
 		if(me->continousMeasurment==SET){
 			me->startMeasurment(me);
 		}
+		return &me->result;
 	}
-	return me->result;
+	return NULL;
 }
 void HcSr04_ResetMeasurment(ultrasonicSensorStruct *me){
 	me->status=HCSR04_Idle;
@@ -85,9 +90,12 @@ void HcSr04_ResetMeasurment(ultrasonicSensorStruct *me){
 	me->continousMeasurment=0;
 }
 void HcSr04_StartMeasurment(ultrasonicSensorStruct *me){
-	if(me->status==HCSR04_Idle){
+	if(me->status==HCSR04_Idle || me->status==HCSR04_CompleteMeasurment){
 		me->status=HCSR04_Measurment;
 		HcSr04_HalStart(me->htim);
+	}else{
+		//TODO dodać error
+		printf("HCSR04 no idle\n");
 	}
 }
 void HcSr04_htimInterrupt(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim){
@@ -116,4 +124,11 @@ void HcSr04_HalStop(TIM_HandleTypeDef *htim){
 	HAL_TIM_IC_Stop(htim, TIM_CHANNEL_2);
 	HAL_TIM_PWM_Stop(htim, TIM_CHANNEL_3);
 	__HAL_TIM_SET_COUNTER(htim,0);
+}
+uint8_t HcSr04_IsReady(ultrasonicSensorStruct *me){
+	if(me->status==HCSR04_Idle || me->status==HCSR04_CompleteMeasurment){
+		return SET;
+	}else{
+		return RESET;
+	}
 }

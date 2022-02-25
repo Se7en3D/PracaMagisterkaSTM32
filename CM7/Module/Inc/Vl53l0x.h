@@ -164,10 +164,11 @@ struct StructVl53l0x {
 	uint32_t (*getMeasurementTimingBudget)(StructVl53l0x* me);
 	uint8_t (*setVcselPulsePeriod)(StructVl53l0x* me,vcselPeriodType type, uint8_t period_pclks);
 	uint8_t (*getVcselPulsePeriod)(StructVl53l0x* me,vcselPeriodType type);
-	void (*startContinuous)(StructVl53l0x* me,uint32_t period_ms);
+	void (*startContinous)(StructVl53l0x* me,uint32_t period_ms);
 	void (*stopContinuous)(StructVl53l0x* me);
 	void (*increaseTime)(StructVl53l0x* me);
 	void (*startSingleMeasurment)(StructVl53l0x* me);
+	uint8_t (*isReady)(StructVl53l0x* me);
 };
 
 StructVl53l0x* vl53l0x_Create(I2C_HandleTypeDef * hi2c,GPIO_TypeDef* xshutgpio,uint16_t xshutpin);
@@ -183,7 +184,8 @@ void vl53l0x_StructInit(StructVl53l0x* me,
 						void (*startContinuous)(StructVl53l0x* me,uint32_t period_ms),
 						void (*stopContinuous)(StructVl53l0x* me),
 						void (*increaseTime)(StructVl53l0x* me),
-						void (*startSingleMeasurment)(StructVl53l0x* me));
+						void (*startSingleMeasurment)(StructVl53l0x* me),
+						uint8_t (*isReady)(StructVl53l0x* me));
 uint8_t vl53l0x_SensorInit(StructVl53l0x *me);
 
 void vl53l0x_WriteReg(StructVl53l0x *me,uint8_t reg, uint8_t value);
@@ -235,4 +237,5 @@ uint16_t* vl53l0x_FunctionWaitUntilStartBitHasBeenCleared(StructVl53l0x* me);
 uint16_t* vl53l0x_FunctionWaitingForTheInterruptFlagToBeSet(StructVl53l0x* me);
 uint16_t* vl53l0x_FunctionTimeout(StructVl53l0x* me);
 void vl53l0x_StartSingleMeasurment(StructVl53l0x* me);
+uint8_t vl53l0x_IsReady(StructVl53l0x* me);
 #endif /* INC_VL53L0X_H_ */

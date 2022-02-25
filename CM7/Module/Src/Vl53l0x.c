@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stm32h7xx_hal.h"
-#include "vl53l0x.h"
-
+#include "Vl53l0x.h"
 
 static uint16_t* (*statusFunction[])(StructVl53l0x* me)={
 		vl53l0x_FunctionNoInitialized,
@@ -66,7 +65,8 @@ StructVl53l0x* vl53l0x_Create(I2C_HandleTypeDef * hi2c,GPIO_TypeDef *xshutgpio,u
 				vl53l0x_StartContinuous,
 				vl53l0x_StopContinuous,
 				vl53l0x_IncreaseTime,
-				vl53l0x_StartSingleMeasurment);
+				vl53l0x_StartSingleMeasurment,
+				vl53l0x_IsReady);
 
 		if(vl53l0x_SensorInit(me)){
 			vl53l0x_GetVcselPulsePeriod(me,VcselPeriodPreRange);
@@ -89,7 +89,8 @@ void vl53l0x_StructInit(StructVl53l0x* me,
 						void (*startContinuous)(StructVl53l0x* me,uint32_t period_ms),
 						void (*stopContinuous)(StructVl53l0x* me),
 						void (*increaseTime)(StructVl53l0x* me),
-						void (*startSingleMeasurment)(StructVl53l0x* me)){
+						void (*startSingleMeasurment)(StructVl53l0x* me),
+						uint8_t (*isReady)(StructVl53l0x* me)){
 	me->getDistance=getDistance;
 	me->setSignalRateLimit=setSignalRateLimit;
 	me->getSignalRateLimit=getSignalRateLimit;
@@ -97,10 +98,11 @@ void vl53l0x_StructInit(StructVl53l0x* me,
 	me->getMeasurementTimingBudget=getMeasurementTimingBudget;
 	me->setVcselPulsePeriod=setVcselPulsePeriod;
 	me->getVcselPulsePeriod=getVcselPulsePeriod;
-	me->startContinuous=startContinuous;
+	me->startContinous=startContinuous;
 	me->stopContinuous=stopContinuous;
 	me->increaseTime=increaseTime;
 	me->startSingleMeasurment=startSingleMeasurment;
+	me->isReady=isReady;
 }
 uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 		uint8_t tempValue=0;
@@ -948,6 +950,7 @@ uint16_t* vl53l0x_FunctionWaitingForTheInterruptFlagToBeSet(StructVl53l0x* me){
 	if((vl53l0x_ReadReg(me,RESULT_INTERRUPT_STATUS) & 0x07)!= 0){
 		me->distance=vl53l0x_ReadReg16Bit(me,RESULT_RANGE_STATUS + 10);
 		vl53l0x_ClearInterruptFlag(me);
+		me->status=vl53l0x_Idle;
 		return &me->distance;
 	}
 	return NULL;
@@ -957,8 +960,18 @@ uint16_t* vl53l0x_FunctionTimeout(StructVl53l0x* me){
 	return NULL;
 }
 void vl53l0x_StartSingleMeasurment(StructVl53l0x* me){
-	if(me->status==vl53l0x_Idle && me->instance->continuousMode==RESET){
+	if((me->status==vl53l0x_Idle)&& me->instance->continuousMode==RESET){
 		me->status=vl53l0x_MeasurmentPreparation;
 		vl53l0x_ResetTime(me);
+	}else{
+		//TODO dodać error;
+		printf("vl53l0x_Start nie IDLE\n");
+	}
+}
+uint8_t vl53l0x_IsReady(StructVl53l0x* me){
+	if(me->status==vl53l0x_Idle && me->instance->continuousMode==RESET){
+		return SET;
+	}else{
+		return RESET;
 	}
 }
