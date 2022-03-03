@@ -7,9 +7,12 @@
 
 #ifndef INC_SERVOPR_H_
 #define INC_SERVOPR_H_
+
+#include "ErrorValue.h"
+
 #define SERVOPR_MIN_PERIOD_IN_MS 1000*0.5 /*!<Najmniejsza wartosc wypełnienia potrzebna do obslugi servo podawana w milisekundach*/
 #define SERVOPR_MAX_PERIOD_IN_MS 1000*2.5 /*!<Największa wartosc wypełnienia potrzebna do obslugi servo podawana w milisekundach*/
-#define SERVOPR_TIME_FOR_OPERATING_SPEED 25 /*!<Prędkość obrotowa potrzebna do ruchu o 15 stopni[ms]*/
+#define SERVOPR_TIME_FOR_OPERATING_SPEED 30 /*!<Prędkość obrotowa potrzebna do ruchu o 15 stopni[ms]*/
 
 typedef enum servoPRStatus servoPRStatus;
 typedef struct servoPRStruct servoPRStruct;

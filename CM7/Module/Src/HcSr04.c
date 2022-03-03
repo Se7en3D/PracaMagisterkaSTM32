@@ -94,8 +94,7 @@ void HcSr04_StartMeasurment(ultrasonicSensorStruct *me){
 		me->status=HCSR04_Measurment;
 		HcSr04_HalStart(me->htim);
 	}else{
-		//TODO dodać error
-		printf("HCSR04 no idle\n");
+		addErrorValue(HCSR04_StatusNoIdle);
 	}
 }
 void HcSr04_htimInterrupt(ultrasonicSensorStruct *me,TIM_HandleTypeDef *htim){

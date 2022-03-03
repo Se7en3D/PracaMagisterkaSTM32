@@ -156,9 +156,9 @@ void uartComSendAdcBatteryVoltage(uint32_t value){
 		return ;
 	}
 
-	if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
+	/*if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
 		return;
-	}
+	}*/
 	uartComPush(0xFF);
 	uartComPush(SEND_BATTERY_MEASURMENT_VALUE);
 	uartComPush(value>>24);

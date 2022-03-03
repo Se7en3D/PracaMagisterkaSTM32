@@ -49,13 +49,40 @@ static const volatile void (*controlFunction[])(carModule *me)={
 		Car_ControlPrepareMeasurmentDistancePos12,
 		Car_ControlWaitForMeasurmentDistance,
 		Car_ControlPickALargerDistanceBetweenPos0AndPos12,
+		Car_ControlWaitForDistanceEqualThatPos6,
+		Car_ControlSetTimeTo100ms,
 		Car_controlWaitForClearIrSensorNo1,
+		Car_ControlStopDrive,
+		Car_ControlDriveForward,
+		Car_ControlDriveBackward,
+		Car_ControlDriveRight,
+		Car_ControlDriveLeft,
+		Car_ControlDriveClockwiseRotation,
+		Car_ControlDriveCountersclockwiseRotation,
+		Car_ControlWaitUntilTheDistanceIsGreater,
+		Car_ControlWaitToStopDrive
 };
 static const volatile carModuleControlStatus stateMachineControlCar[]={
 		controlIdle,
 		controlChangePosition,
 		controlWaitForRangeMeasurment,
 		controlIdle,
+		controlStopDrive,
+		controlPrepareMeasurmentDistancePos3,
+		controlWaitForMeasurmentDistance,
+		controlDriveBackward,
+		controlWaitUntilTheDistanceIsGreater,
+		controlDriveClockwiseRotation,
+		controlSetTimeTo100ms,
+		controlWaitToStopDrive,
+		controlStopDrive,
+		controlIdle,
+		controlStopDrive,
+		controlPrepareMeasurmentDistancePos6,
+		controlWaitForMeasurmentDistance,
+		controlDriveBackward,
+		controlWaitUntilTheDistanceIsGreater,
+		controlStopDrive,
 		controlPrepareMeasurmentDistancePos0,
 		controlWaitForMeasurmentDistance,
 		controlPrepareMeasurmentDistancePos12,
@@ -63,22 +90,50 @@ static const volatile carModuleControlStatus stateMachineControlCar[]={
 		controlPrepareMeasurmentDistancePos6,
 		controlWaitForMeasurmentDistance,
 		controlPickALargerDistanceBetweenPos0AndPos12,
-		controlWaitForClearIrSensorNo1,
+		controlWaitForDistanceisEqualThatPos6,
+		controlStopDrive,
+		controlIdle,
+		controlStopDrive,
+		controlPrepareMeasurmentDistancePos9,
+		controlWaitForMeasurmentDistance,
+		controlDriveBackward,
+		controlWaitUntilTheDistanceIsGreater,
+		controlDriveCountersclockwiseRotation,
+		controlSetTimeTo100ms,
+		controlWaitToStopDrive,
+		controlStopDrive,
+		controlIdle,
+		controlStopDrive,
+		controlSetTimeTo100ms,
+		controlDriveForward,
+		controlWaitToStopDrive,
+		controlSetTimeTo100ms,
+		controlDriveRight,
+		controlWaitToStopDrive,
+		controlIdle,
+		controlStopDrive,
+		controlSetTimeTo100ms,
+		controlDriveForward,
+		controlWaitToStopDrive,
+		controlSetTimeTo100ms,
+		controlDriveLeft,
+		controlWaitToStopDrive,
+		controlIdle,
+		controlStopDrive,
+		controlSetTimeTo100ms,
+		controlDriveForward,
+		controlWaitToStopDrive,
+		controlSetTimeTo100ms,
+		controlWaitToStopDrive,
+		controlPrepareMeasurmentDistancePos0,
+		controlWaitForMeasurmentDistance,
+		controlPrepareMeasurmentDistancePos12,
+		controlWaitForMeasurmentDistance,
+		controlPickALargerDistanceBetweenPos0AndPos12,
+		controlSetTimeTo100ms,
+		controlWaitToStopDrive,
 		controlIdle,
 };
-/*
-static const volatile carModuleControlStatus nextControlStatus={
-		controlChangePosition,
-		controlWaitForRangeMeasurment,
-		controlIdle,
-		controlPrepareMeasurmentDistancePos0,
-		controlWaitForMeasurmentDistance,
-		controlPrepareMeasurmentDistancePos12,
-		controlPrepareMeasurmentDistancePos6,
-		controlPickALargerDistanceBetweenPos0AndPos12,
-		controlWaitForClearIrSensorNo1,
-		controlIdle,
-};*/
 
 carModule* Car_Create(TIM_HandleTypeDef* timer1ms){
 	carModule* me=malloc(sizeof(carModule));
@@ -90,6 +145,7 @@ carModule* Car_Create(TIM_HandleTypeDef* timer1ms){
 		me->timerMeasureBatteryVoltage=0;
 		me->timerToSendIrSensorStatus=0;
 		me->driveStatus=RESET_DRIVE;
+		me->measureDistanceForPcCount=0;
 		me->rangeMeasurmentControl=RangeMeasurment_Create();
 		me->modeDriving=modeDrivingManual;
 		Car_Init(me,
@@ -161,7 +217,7 @@ void Car_mainFun(carModule *me){
 			}
 			me->driveStatus=decodeStatus;
 		}else{
-			//TODO dodać error
+			addErrorValue(CAR_OutOdSizeFunctionSevices);
 		}
 		me->inMessage->ClearBuffer(me->inMessage);
 	}
@@ -203,24 +259,30 @@ void Car_NotRecognized(carModule *me){
 	me->motorControl->resetDriving(me->motorControl);
 }
 void Car_DrivingForward(carModule *me){
-	uint8_t maskForIr=0b00000010;
-	uint8_t irSensorValue=me->irSensor->getValue(me->irSensor);
-	if(irSensorValue&=maskForIr){
-		uint32_t positionStateMachineControlerCar=me->autoDriveVariable.positionStateMachineControlCar;
-		if(positionStateMachineControlerCar<=3){
-			me->motorControl->resetDriving(me->motorControl);
-			me->autoDriveVariable.positionStateMachineControlCar=4;
+	uint32_t positionStateMachineControlerCar=me->autoDriveVariable.positionStateMachineControlCar;
+	if(positionStateMachineControlerCar<=3){
+		uint8_t irSensorValue=me->irSensor->getValue(me->irSensor);
+		uint32_t position=Car_AutoDriveGetAutoPosition(&me->autoDriveVariable,irSensorValue,me->driveStatus);
+		if(position){
+			me->autoDriveVariable.positionStateMachineControlCar=position;
+		}else{
+			me->motorControl->drivingForward(me->motorControl);
 		}
-	}else{
-		if(me->autoDriveVariable.positionStateMachineControlCar==0){
-			me->autoDriveVariable.positionStateMachineControlCar=1;
-		}
-		me->motorControl->drivingForward(me->motorControl);
 	}
 	controlFunction[stateMachineControlCar[me->autoDriveVariable.positionStateMachineControlCar]](me);
 }
 void Car_DrivingBackwart(carModule *me){
-	me->motorControl->drivingBackwart(me->motorControl);
+	uint32_t positionStateMachineControlerCar=me->autoDriveVariable.positionStateMachineControlCar;
+		if(positionStateMachineControlerCar<=3){
+			uint8_t irSensorValue=me->irSensor->getValue(me->irSensor);
+			uint32_t position=Car_AutoDriveGetAutoPosition(&me->autoDriveVariable,irSensorValue,me->driveStatus);
+			if(position){
+				me->autoDriveVariable.positionStateMachineControlCar=position;
+			}else{
+				me->motorControl->drivingBackwart(me->motorControl);
+			}
+		}
+		controlFunction[stateMachineControlCar[me->autoDriveVariable.positionStateMachineControlCar]](me);
 }
 void Car_DrivingRight(carModule *me){
 	me->motorControl->drivingRight(me->motorControl);
@@ -237,6 +299,10 @@ void Car_ClockwiseRotation(carModule *me){
 void Car_ResetDriving(carModule *me){
 	me->driveStatus=RESET_DRIVE;
 	me->autoDriveVariable.positionStateMachineControlCar=0;
+	if(me->measureDistanceForPcCount>0){
+		addErrorValue(CAR_MeasureDistanceForPcCountIsNoZero);
+		me->measureDistanceForPcCount=0;
+	}
 	me->motorControl->resetDriving(me->motorControl);
 }
 void Car_DrivingReverseRight(carModule *me){
@@ -249,7 +315,23 @@ void Car_GetStatusFromAllStruct(carModule *me){
 	printf("Wysłanie statusu\n");
 }
 void Car_MeasureDistanceForPc(carModule *me){
-	printf("Pomiary odleglosci\n");
+	me->timeToResetMotorControl=0;
+	if(me->measureDistanceForPcCount>=CAR_MAX_MEASURE_DISTANCE_FOR_PC){
+		me->measureDistanceForPcCount=0;
+		Car_ResetDriving(me);
+	}else{
+		if(me->rangeMeasurmentControl->isRangeMeasurmentEnd(me->rangeMeasurmentControl)){
+			uint16_t value1=*me->rangeMeasurmentControl->getVl53l0xDistance(me->rangeMeasurmentControl);
+			uint32_t value2=*me->rangeMeasurmentControl->getHcSr04Distance(me->rangeMeasurmentControl);
+			//uint8_t pos=*me->rangeMeasurmentControl->getServoPRPosition(me->rangeMeasurmentControl);
+			me->outMessage->InsertDistance(me->outMessage,value2,value1);
+			me->measureDistanceForPcCount++;
+		}
+		me->rangeMeasurmentControl->rangeMeasurment(me->rangeMeasurmentControl,6);
+
+	}
+
+
 }
 				/*
 				 * Funkcje kontroli jazdy automatycznej, pomiaru odległości itp.
@@ -369,12 +451,34 @@ void Car_ControlPickALargerDistanceBetweenPos0AndPos12(carModule *me){
 	uint32_t sumDistancePos0=me->autoDriveVariable.HcSr04Distance[0]+me->autoDriveVariable.Vl53l0xDistance[0];
 	uint32_t sumDistancePos12=me->autoDriveVariable.HcSr04Distance[12]+me->autoDriveVariable.Vl53l0xDistance[12];
 	if(sumDistancePos0>sumDistancePos12){
-		me->motorControl->countersclockwiseRotation(me->motorControl);
+		if(me->rangeMeasurmentControl->rangeMeasurment(me->rangeMeasurmentControl,12)){
+			me->motorControl->countersclockwiseRotation(me->motorControl);
+		}
 	}else{
-		me->motorControl->clockwiseRotation(me->motorControl);
+		if(me->rangeMeasurmentControl->rangeMeasurment(me->rangeMeasurmentControl,0)){
+			me->motorControl->clockwiseRotation(me->motorControl);
+		}
 	}
 	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
 
+}
+void Car_ControlWaitForDistanceEqualThatPos6(carModule *me){
+	uint8_t servoPosition=*me->rangeMeasurmentControl->getServoPRPosition(me->rangeMeasurmentControl);
+	if(me->rangeMeasurmentControl->isRangeMeasurmentEnd(me->rangeMeasurmentControl)){
+		uint32_t distance=*me->rangeMeasurmentControl->getVl53l0xDistance(me->rangeMeasurmentControl);
+		uint32_t distanceLarger=me->autoDriveVariable.Vl53l0xDistance[6]*1.25;
+		uint32_t distanceSmaller=me->autoDriveVariable.Vl53l0xDistance[6]*0.75;
+		printf("pomiar=%d por=%d\n",distance,me->autoDriveVariable.Vl53l0xDistance[6]);
+		if(distance>=distanceSmaller && distance<=distanceLarger){
+			Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+			return;
+		}
+	}
+	me->rangeMeasurmentControl->rangeMeasurment(me->rangeMeasurmentControl,servoPosition);
+}
+void Car_ControlSetTimeTo100ms(carModule *me){
+	me->autoDriveVariable.time=100;
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
 }
 void Car_controlWaitForClearIrSensorNo1(carModule *me){
 	uint32_t irSensorObstacle=me->irSensor->getValue(me->irSensor);
@@ -383,6 +487,51 @@ void Car_controlWaitForClearIrSensorNo1(carModule *me){
 		Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
 	}
 }
+void Car_ControlStopDrive(carModule *me){
+	me->motorControl->resetDriving(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlDriveForward(carModule *me){
+	me->motorControl->drivingForward(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlDriveBackward(carModule *me){
+	me->motorControl->drivingBackwart(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlDriveRight(carModule *me){
+	me->motorControl->drivingRight(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlDriveLeft(carModule *me){
+	me->motorControl->drivingLeft(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlDriveClockwiseRotation(carModule *me){
+	me->motorControl->clockwiseRotation(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlDriveCountersclockwiseRotation(carModule *me){
+	me->motorControl->countersclockwiseRotation(me->motorControl);
+	Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+}
+void Car_ControlWaitUntilTheDistanceIsGreater(carModule *me){
+	uint8_t servoPosition=*me->rangeMeasurmentControl->getServoPRPosition(me->rangeMeasurmentControl);
+	if(me->rangeMeasurmentControl->isRangeMeasurmentEnd(me->rangeMeasurmentControl)){
+		uint32_t distance=*me->rangeMeasurmentControl->getVl53l0xDistance(me->rangeMeasurmentControl);
+		if(distance>100){
+			Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+		}else{
+			me->rangeMeasurmentControl->rangeMeasurment(me->rangeMeasurmentControl,servoPosition);
+		}
+	}
+}
+void Car_ControlWaitToStopDrive(carModule *me){
+	if(me->autoDriveVariable.time==0){
+		Car_NextPositionStateMachineControlCar(&me->autoDriveVariable);
+	}
+}
+
 void Car_AddIrSensor(carModule *me,GPIO_TypeDef *gpio, uint16_t pin){
 	me->irSensor->addGPIO(me->irSensor,gpio,pin);
 }
@@ -390,14 +539,75 @@ void Car_NextPositionStateMachineControlCar(carAutoDrive *me){
 	uint32_t next=me->positionStateMachineControlCar+1;
 	uint32_t sizeOfStateMachine=sizeof(stateMachineControlCar)/sizeof(stateMachineControlCar[0]);
 	if(next>=sizeOfStateMachine){
-		//TODO error
-		printf("Out of size Car_NextPositionStateMachineControlCar()\n");
+		addErrorValue(CAR_OutOfSizeStateMachine);
 	}
 	if(stateMachineControlCar[next]==controlIdle){
 		next=0;
 	}
 	me->positionStateMachineControlCar=next;
 	//me->controlStatus=stateMachineControlCar[next];
+}
+uint32_t Car_AutoDriveGetAutoPosition(carAutoDrive *me,uint8_t irSensorValue,functionFromPcEnum driveStatus){
+	uint32_t returnNumber=0;
+	uint8_t irSensorAfterMasking=0;
+	switch(driveStatus){
+		case RIDE_FORWARD_FUN:
+			irSensorAfterMasking=irSensorValue&0b00000111;
+			switch(irSensorAfterMasking){
+				case 0b00000001:
+					returnNumber=4;
+					break;
+				case 0b00000010:
+					returnNumber=14;
+					break;
+				case 0b00000011:
+					returnNumber=4;
+					break;
+				case 0b00000100:
+					returnNumber=30;
+					break;
+				case 0b00000101:
+					returnNumber=4;
+					break;
+				case 0b00000110:
+					returnNumber=30;
+					break;
+				case 0b00000111:
+					returnNumber=4;
+					break;
+			}
+			break;
+		case RIDE_BACKWARD_FUN:
+			irSensorAfterMasking=irSensorValue&0b01100000;
+			switch(irSensorAfterMasking){
+				case 0b00100000:
+					break;
+					returnNumber=40;
+				case 0b01000000:
+					returnNumber=48;
+					break;
+				case 0b01100000:
+					returnNumber=56;
+					break;
+			}
+			break;
+		case RIDE_RIGHT_FUN:
+			irSensorAfterMasking=irSensorValue&0b00000111;
+			break;
+		case RIDE_LEFT_FUN:
+			break;
+		case ROTATE_LEFT:
+			break;
+		case ROTATE_RIGHT:
+			break;
+		case RIDE_BACKWARD_RIGHT:
+			break;
+		case RIDE_BACKWARD_LEFT:
+			break;
+		default:
+			break;
+	}
+	return returnNumber;
 }
 
 						/*FUNKCJE OBSLUGI BLEDOW ORAZ PRZERWAN*/
@@ -406,9 +616,6 @@ int __io_putchar(int ch)
   if (ch == '\n') {
     __io_putchar('\r');
   }
-
-  //TODO Dodać komendę do wysyłania odpowiedzi poprzez Bluetooth
-  //Message_Insert(generalCarModule.outMessage,ch);
   CarTestModule->outMessage->Insert(CarTestModule->outMessage,ch);
   return 1;
 }
@@ -422,6 +629,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 		CarTestModule->inMessage->AddTimeout(CarTestModule->inMessage);
 		CarTestModule->batteryVoltage->addTime(CarTestModule->batteryVoltage);
 		CarTestModule->rangeMeasurmentControl->timeInterrupt(CarTestModule->rangeMeasurmentControl);
+		if(CarTestModule->autoDriveVariable.time>0){
+			CarTestModule->autoDriveVariable.time--;
+		}
 	}
 	CarTestModule->rangeMeasurmentControl->HcSr04Interrupt(CarTestModule->rangeMeasurmentControl,htim);
 
@@ -445,5 +655,5 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 }
 
 void addErrorValue(uint8_t value ){
-	CarTestModule->outMessage->Insert(CarTestModule->outMessage,value);
+	CarTestModule->outMessage->InsertError(CarTestModule->outMessage,value);
 }

@@ -227,7 +227,6 @@ uint16_t vl53l0x_DecodeTimeout(uint16_t reg_val);
 uint16_t vl53l0x_EncodeTimeout(uint32_t timeout_mclks);
 uint32_t vl53l0x_TimeoutMclksToMicroseconds(uint16_t timeout_period_mclks, uint8_t vcsel_period_pclks);
 uint32_t vl53l0x_TimeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t vcsel_period_pclks);
-extern void addErrorValue(uint8_t value);
 void vl53l0x_IncreaseTime(StructVl53l0x* me);
 uint16_t* vl53l0x_FunctionNoInitialized(StructVl53l0x* me);
 uint16_t* vl53l0x_FunctionInitializedError(StructVl53l0x* me);

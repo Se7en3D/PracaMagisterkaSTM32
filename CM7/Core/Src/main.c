@@ -225,7 +225,7 @@ Error_Handler();
 									 VL53L0X_XSHUT_GPIO_Port,
 									 VL53L0X_XSHUT_Pin);
 	  CarTestModule->createIrSensor(CarTestModule);
-	  CarTestModule->createMotorControl(CarTestModule,GPIOE,GPIO_PIN_3,GPIO_PIN_2,GPIO_PIN_5,GPIO_PIN_4,&htim12,TIM_CHANNEL_1,TIM_CHANNEL_2);
+	  CarTestModule->createMotorControl(CarTestModule,GPIOE,GPIO_PIN_2,GPIO_PIN_3,GPIO_PIN_4,GPIO_PIN_5,&htim12,TIM_CHANNEL_1,TIM_CHANNEL_2);
 	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_1_GPIO_Port,IR_NR_1_Pin);
 	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_2_GPIO_Port,IR_NR_2_Pin);
 	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_3_GPIO_Port,IR_NR_3_Pin);

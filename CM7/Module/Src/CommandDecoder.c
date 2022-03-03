@@ -129,6 +129,7 @@ uint8_t CommandDecoder_DecodeTheFunction(bluetoothDecoderStruct* const me){
 		break;
 	case 0x08:
 		decodedValue=RIDE_BACKWARD_RIGHT;
+		break;
 	case 0x09:
 		decodedValue=RIDE_BACKWARD_LEFT;
 		break;

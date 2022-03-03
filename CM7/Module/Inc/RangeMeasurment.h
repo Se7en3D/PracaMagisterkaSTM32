@@ -10,6 +10,7 @@
 #include "Vl53l0x.h"
 #include "ServoPR.h"
 #include "HcSr04.h"
+#include "ErrorValue.h"
 
 #define RANGEMEASURMENT_TIME_FOR_ERROR_SERVOPR 1000 /*!<Czas po ktorym nastepuje wykrycie problemu z serwomechanizmem[ms]*/
 #define RANGEMEASURMENT_TIME_FOR_ERROR_RANGE_MEASURMENT 300 /*!<Czas po ktorym nastepuje wykrycie problemu z serwomechanizmem[ms]*/

@@ -129,7 +129,7 @@ uint8_t RangeMeasurment_isRangeMeasurmentEnd(rangeMeasurmentStruct *me){
 volatile void RangeMeasurment_IdleFunction(rangeMeasurmentStruct *me){}
 void RangeMeasurment_PostitionChangingFunction(rangeMeasurmentStruct *me){
 	if(me->time>RANGEMEASURMENT_TIME_FOR_ERROR_SERVOPR){
-		//TODO dodać error
+		addErrorValue(RANGEMEASURMENT_TimeoutPositionChangingFunction);
 		me->status=rangeMeasurmentIdle;
 		me->time=0;
 	}
@@ -147,14 +147,16 @@ void RangeMeasurment_PostitionChangingFunction(rangeMeasurmentStruct *me){
 }
 void RangeMeasurment_MeasurmentDistanceFunction(rangeMeasurmentStruct *me){
 	if(me->time>RANGEMEASURMENT_TIME_FOR_ERROR_RANGE_MEASURMENT){
-			//TODO dodać error
+			addErrorValue(RANGEMEASURMENT_TimeoutMeasurmentDistanceFunction);
 			me->status=rangeMeasurmentIdle;
 			me->time=0;
 			if(me->hcSr04LockValue==RESET){
+				addErrorValue(RANGEMEASURMENT_NoSetLockHcSr04);
 				me->hcSr04Distance=0;
 				me->hcSr04LockValue=SET;
 			}
 			if(me->Vl53l0xLockValue==RESET){
+				addErrorValue(RANGEMEASURMENT_NoSetLockVl53l0x);
 				me->Vl53l0xDistance=0;
 				me->Vl53l0xLockValue=SET;
 			}

@@ -18,7 +18,7 @@ static uint16_t* (*statusFunction[])(StructVl53l0x* me)={
 		vl53l0x_FunctionWaitingForTheInterruptFlagToBeSet,
 		vl53l0x_FunctionTimeout
 };
-	//TODO uzupełnić
+
 StructVl53l0x* vl53l0x_Create(I2C_HandleTypeDef * hi2c,GPIO_TypeDef *xshutgpio,uint16_t xshutpin){
 	StructVl53l0x* me=malloc(sizeof(StructVl53l0x));
 	if(me!=NULL){
@@ -149,7 +149,7 @@ uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 		  uint8_t spad_count;
 		  uint8_t spad_type_is_aperture;
 		  if (!vl53l0x_GetSpadInfo(me,&spad_count, &spad_type_is_aperture)) {
-			  //TODO dodać error
+			  addErrorValue(VL5310X_ErrorGetSpadInfo);
 			  return 0;
 		  }
 
@@ -317,7 +317,7 @@ uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 
 		  vl53l0x_WriteReg(me,SYSTEM_SEQUENCE_CONFIG, 0x01);
 		  if (!vl53l0x_PerformSingleRefCalibration(me,0x40)) {
-			  //TODO dodać error
+			  addErrorValue(VL5310x_ErrorPerformSingleRefCalibration);
 			  return 0;
 		  }
 
@@ -327,7 +327,7 @@ uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 
 		  vl53l0x_WriteReg(me,SYSTEM_SEQUENCE_CONFIG, 0x02);
 		  if (!vl53l0x_PerformSingleRefCalibration(me,0x00)) {
-			  //TODO dodać error
+			  addErrorValue(VL5310x_ErrorPerformSingleRefCalibration);
 			  return 0;
 		  }
 
@@ -429,8 +429,7 @@ uint8_t vl53l0x_SetMeasurementTimingBudget(StructVl53l0x* me,uint32_t budget_us)
 	  uint32_t const MinTimingBudget = 20000;
 
 	  if (budget_us < MinTimingBudget) {
-		  //errorCodePush(VL5310X_INCORRECT_BUDGET_US);
-		  //TODO dodać error
+		  addErrorValue(VL5310X_IncorrectBudgetUs);
 		  return 0;
 	  }
 
@@ -574,9 +573,8 @@ uint8_t vl53l0x_SetVcselPulsePeriod(StructVl53l0x* me,vcselPeriodType type, uint
 	        break;
 
 	      default:
-	        // invalid period
-	    	 // errorCodePush(VL5310X_INCORRECT_PERIOD_VCSELPERIODPRERANGE);
-	    	  //TODO dodać error
+
+	    	 addErrorValue(VL5310X_IncorrectPeriodVcSelPeriodPrerange);
 	        return 0;
 	    }
 	    vl53l0x_WriteReg(me,PRE_RANGE_CONFIG_VALID_PHASE_LOW, 0x08);
@@ -648,8 +646,7 @@ uint8_t vl53l0x_SetVcselPulsePeriod(StructVl53l0x* me,vcselPeriodType type, uint
 
 	      default:
 	        // invalid period
-	    	  //errorCodePush(VL5310X_INCORRECT_PERIOD_VCSELPERIODFINALRANGE);
-	    	  //TODO dodać error
+	    	  addErrorValue(VL5310X_IncorrectPeriodVcSelPeriodFinalrange);
 	        return 0;
 	    }
 
@@ -677,8 +674,8 @@ uint8_t vl53l0x_SetVcselPulsePeriod(StructVl53l0x* me,vcselPeriodType type, uint
 	    // set_sequence_step_timeout end
 	  }else{
 	    // invalid type
-		  //errorCodePush(VL5310X_INCORRECT_TYPE_VCSELPERIODTYPE);
-		  //TODO dodać error
+		  addErrorValue(VL5310X_IncorrectTypeVcselperiodType);
+
 		  return 0;
 	  }
 
@@ -704,7 +701,7 @@ uint8_t vl53l0x_GetVcselPulsePeriod(StructVl53l0x* me,vcselPeriodType type){
 	}else if (type == VcselPeriodFinalRange){
 		return decodeVcselPeriod(vl53l0x_ReadReg(me,FINAL_RANGE_CONFIG_VCSEL_PERIOD));
 	}else {
-		//TODO dodać error
+		addErrorValue(VL5310X_OutOfTypeVcSelPeriodType);
 		return 255;
 	}
 }
@@ -783,7 +780,6 @@ uint8_t vl53l0x_GetSpadInfo(StructVl53l0x* me,uint8_t * count, uint8_t * type_is
 	  while (vl53l0x_ReadReg(me,0x83) == 0x00){
 	    if (i<1) {
 	    	//errorCodePush(VL5310X_TIMEOUT_GETSPADINFO);
-	    	//TODO dodać error
 	    	return 0;
 	    }
 	    --i;
@@ -872,8 +868,7 @@ uint16_t vl53l0x_EncodeTimeout(uint32_t timeout_mclks){
 	    return (ms_byte << 8) | (ls_byte & 0xFF);
 	  }
 	  else {
-		  //errorCodePush(VL5310X_ERROR_ENCODETIMEOUT);
-		  //TODO dodać error
+		  addErrorValue(VL5310X_ErrorEndCodeTimeout);
 		  return 0;
 	  }
 }
@@ -887,11 +882,6 @@ uint32_t vl53l0x_TimeoutMicrosecondsToMclks(uint32_t timeout_period_us, uint8_t 
 
 	  return (((timeout_period_us * 1000) + (macro_period_ns / 2)) / macro_period_ns);
 }
-
-void __attribute__((weak)) addErrorValue(uint8_t value ){
-
-}
-
 void vl53l0x_IncreaseTime(StructVl53l0x* me){
 	me->time++;
 }
@@ -964,8 +954,7 @@ void vl53l0x_StartSingleMeasurment(StructVl53l0x* me){
 		me->status=vl53l0x_MeasurmentPreparation;
 		vl53l0x_ResetTime(me);
 	}else{
-		//TODO dodać error;
-		printf("vl53l0x_Start nie IDLE\n");
+		addErrorValue(VL5310X_StatusNoIdle);
 	}
 }
 uint8_t vl53l0x_IsReady(StructVl53l0x* me){

@@ -70,20 +70,19 @@ void MotorsControl_Init(motorsControlStruct* me,
 
 void MotorsControl_DrivingForward(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerPeriod,me->timerPeriod);
-	MotorsControl_SetOutput(me,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET);
+	MotorsControl_SetOutput(me,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
 }
 void MotorsControl_DrivingRight(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerPeriod,me->timerCompareForTurn);
-	MotorsControl_SetOutput(me,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET);
-
+	MotorsControl_SetOutput(me,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
 }
 void MotorsControl_DrivingLeft(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerCompareForTurn,me->timerPeriod);
-	MotorsControl_SetOutput(me,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET);
+	MotorsControl_SetOutput(me,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
 }
 void MotorsControl_DrivingBackwart(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerPeriod,me->timerPeriod);
-	MotorsControl_SetOutput(me,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
+	MotorsControl_SetOutput(me,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET);
 }
 void MotorsControl_ClockwiseRotation(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerPeriod,me->timerPeriod);
@@ -97,11 +96,11 @@ void MotorsControl_CountersclockwiseRotation(motorsControlStruct* me){
 }
 void MotorsControl_DrivingReverseRight(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerPeriod,me->timerCompareForTurn);
-	MotorsControl_SetOutput(me,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
+	MotorsControl_SetOutput(me,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET);
 }
 void MotorsControl_DrivingReverseLeft(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerCompareForTurn,me->timerPeriod);
-	MotorsControl_SetOutput(me,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET);
+	MotorsControl_SetOutput(me,GPIO_PIN_SET,GPIO_PIN_RESET,GPIO_PIN_SET,GPIO_PIN_RESET);
 }
 void MotorsControl_ResetDriving(motorsControlStruct* me){
 	MotorsControl_SetHtimCompare(me,me->timerPeriod,me->timerPeriod);

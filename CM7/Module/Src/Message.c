@@ -85,9 +85,9 @@ void Message_InsertIrSensor(messageStruct* const me,uint32_t value){
 	me->buffer->insert(me->buffer,0xFE);
 }
 void Message_InsertAdcBatteryVoltage(messageStruct* const me,uint32_t value){
-	if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
+	/*if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
 		return;
-	}
+	}*/
 	me->buffer->insert(me->buffer,0xFF);
 	me->buffer->insert(me->buffer,SEND_BATTERY_MEASURMENT_VALUE);
 	me->buffer->insert(me->buffer,value>>24);

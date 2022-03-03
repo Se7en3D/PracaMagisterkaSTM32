@@ -9,6 +9,7 @@
 #define CAR_TIME_TO_SEND_STATUS_IRSENSOR 250 /*!<Czas po jakim nalezy wyslac status czujnikow IR*/
 #define driveFunctionLength sizeof(driveFunction)/sizeof(driveFunction[0])
 #define CAR_TIME_TO_RESET_DRIVE 300 /*!<Czas po jakim należy zresetować kierunek jazdy*/
+#define CAR_MAX_MEASURE_DISTANCE_FOR_PC 10 /*!<Ilość pomiarów testowych po odebraniu funkcji MEASURE_DISTANCE_FUN*/
 typedef struct carModule carModule;
 typedef struct carAutoDrive carAutoDrive;
 typedef enum carModuleControlStatus carModuleControlStatus;
@@ -21,7 +22,7 @@ enum carModuleModeDriving{
 };
 
 enum carModuleControlStatus{
-	controlIdle=0,
+	controlIdle,
 	controlChangePosition,
 	controlWaitForRangeMeasurment,
 	controlPrepareMeasurmentDistancePos0,
@@ -39,7 +40,19 @@ enum carModuleControlStatus{
 	controlPrepareMeasurmentDistancePos12,
 	controlWaitForMeasurmentDistance,
 	controlPickALargerDistanceBetweenPos0AndPos12,
-	controlWaitForClearIrSensorNo1
+	controlWaitForDistanceisEqualThatPos6,
+	controlSetTimeTo100ms,
+	controlWaitForClearIrSensorNo1,
+	controlStopDrive,
+	controlDriveForward,
+	controlDriveBackward,
+	controlDriveRight,
+	controlDriveLeft,
+	controlDriveClockwiseRotation,
+	controlDriveCountersclockwiseRotation,
+	controlWaitUntilTheDistanceIsGreater,
+	controlWaitToStopDrive,
+
 };
 struct carAutoDrive{
 	uint32_t HcSr04Distance[13];
@@ -58,6 +71,7 @@ struct carModule{
 	uint32_t timerToSendIrSensorStatus;
 	uint32_t timeToResetMotorControl;
 	functionFromPcEnum driveStatus;
+	uint8_t measureDistanceForPcCount;
 		//Moduły
 	messageStruct *outMessage;
 	bluetoothDecoderStruct *inMessage;
@@ -127,8 +141,21 @@ void Car_ControlPrepareMeasurmentDistancePos11(carModule *me);
 void Car_ControlPrepareMeasurmentDistancePos12(carModule *me);
 void Car_ControlWaitForMeasurmentDistance(carModule *me);
 void Car_ControlPickALargerDistanceBetweenPos0AndPos12(carModule *me);
+void Car_ControlWaitForDistanceEqualThatPos6(carModule *me);
+void Car_ControlSetTimeTo100ms(carModule *me);
 void Car_controlWaitForClearIrSensorNo1(carModule *me);
+void Car_ControlStopDrive(carModule *me);
+void Car_ControlDriveForward(carModule *me);
+void Car_ControlDriveBackward(carModule *me);
+void Car_ControlDriveRight(carModule *me);
+void Car_ControlDriveLeft(carModule *me);
+void Car_ControlDriveClockwiseRotation(carModule *me);
+void Car_ControlDriveCountersclockwiseRotation(carModule *me);
+void Car_ControlWaitUntilTheDistanceIsGreater(carModule *me);
+void Car_ControlWaitToStopDrive(carModule *me);
 
 void Car_NextPositionStateMachineControlCar(carAutoDrive *me);
+uint32_t Car_AutoDriveGetAutoPosition(carAutoDrive *me,uint8_t irSensorValue,functionFromPcEnum
+);
 void Car_AddIrSensor(carModule *me,GPIO_TypeDef *gpio, uint16_t pin);
 

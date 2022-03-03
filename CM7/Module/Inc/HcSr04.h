@@ -7,7 +7,7 @@
 
 #ifndef INC_HCSR04_H_
 #define INC_HCSR04_H_
-
+#include "ErrorValue.h"
 typedef struct ultrasonicSensorStruct ultrasonicSensorStruct;
 typedef enum ultrasonicSensorStatus ultrasonicSensorStatus;
 
