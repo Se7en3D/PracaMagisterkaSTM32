@@ -71,6 +71,7 @@ uint8_t servoPR_SetPosition(servoPRStruct *me,uint8_t numberPosition){
 	uint8_t maxPosition=sizeof(servoPR_PwmPeriod)/sizeof(uint16_t);
 	if(numberPosition>=maxPosition){
 		addErrorValue(SERVOPR_OutOfMaxServoPosition);
+		printf("Blad ustawiona wartosc to %d\n",numberPosition);
 		return RESET;
 	}
 	if(me->status==servoPR_IDLE){

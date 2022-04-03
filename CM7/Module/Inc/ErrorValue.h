@@ -29,6 +29,7 @@
 #define CAR_OutOfSizeStateMachine 23
 #define CAR_TimeoutResetMotorControl 24
 #define CAR_MeasureDistanceForPcCountIsNoZero 25
+#define CAR_SizeStateMachineIsZero 26
 
 
 

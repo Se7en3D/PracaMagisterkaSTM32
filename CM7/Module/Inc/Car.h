@@ -52,6 +52,14 @@ enum carModuleControlStatus{
 	controlDriveCountersclockwiseRotation,
 	controlWaitUntilTheDistanceIsGreater,
 	controlWaitToStopDrive,
+	controlDriveByPickPosition,
+	controlDriveBackwardRight,
+	controlDriveMachineStop,
+	controlFindMinimalPosition,
+	controlPrepareMeasurmentDistanceFromMinimalPosition,
+	controlSetSmallPositionToPos6,
+	controlWaitUntilTheDistanceIsGreaterThat20,
+	controlDriveBackwardLeft
 
 };
 struct carAutoDrive{
@@ -59,6 +67,8 @@ struct carAutoDrive{
 	uint16_t Vl53l0xDistance[13];
 	//carModuleControlStatus controlStatus;
 	uint32_t positionStateMachineControlCar;
+	uint8_t selectedLargerPosition;
+	uint8_t selectedSmallerPosition;
 	uint32_t time;
 };
 struct carModule{
@@ -123,6 +133,7 @@ void Car_DrivingReverseRight(carModule *me);
 void Car_DrivingReverseLeft(carModule *me);
 void Car_GetStatusFromAllStruct(carModule *me);
 void Car_MeasureDistanceForPc(carModule *me);
+
 void Car_ControlIdle(carModule *me);
 void Car_ControlChangePosition(carModule *me);
 void Car_ControlWaitForRangeMeasurment(carModule *me);
@@ -153,8 +164,17 @@ void Car_ControlDriveClockwiseRotation(carModule *me);
 void Car_ControlDriveCountersclockwiseRotation(carModule *me);
 void Car_ControlWaitUntilTheDistanceIsGreater(carModule *me);
 void Car_ControlWaitToStopDrive(carModule *me);
+void Car_ControlDriveByPickPosition(carModule *me);
+void Car_ControlDriveBackwardRight(carModule *me);
+void Car_ControlDriveMachineStop(carModule *me);
+void Car_ControlFindMinimalPosition(carModule *me);
+void Car_ControlPrepareMeasurmentDistanceFromMinimalPosition(carModule *me);
+void Car_ControlSetSmallPositionToPos6(carModule *me);
+void Car_ControlWaitUntilTheDistanceIsGreaterThat20(carModule *me);
+void Car_ControlDriveBackwardLeft(carModule *me);
 
 void Car_NextPositionStateMachineControlCar(carAutoDrive *me);
+void Car_PrevPositionStateMachineControlCar(carAutoDrive *me);
 uint32_t Car_AutoDriveGetAutoPosition(carAutoDrive *me,uint8_t irSensorValue,functionFromPcEnum
 );
 void Car_AddIrSensor(carModule *me,GPIO_TypeDef *gpio, uint16_t pin);

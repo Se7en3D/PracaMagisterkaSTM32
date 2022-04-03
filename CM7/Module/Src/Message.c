@@ -15,7 +15,8 @@ messageStruct *Message_Create(UART_HandleTypeDef *huart){
 				Message_InsertDistanceWithPosition,
 				Message_InsertIrSensor,
 				Message_InsertAdcBatteryVoltage,
-				Message_SendMessage);
+				Message_SendMessage,
+				Message_SendDriveStatus);
 		return me;
 	}else{
 		return NULL;
@@ -24,11 +25,12 @@ messageStruct *Message_Create(UART_HandleTypeDef *huart){
 void Message_Init(messageStruct* const me,
 		void(*Insert)(messageStruct* const me,uint8_t data),
 		void(*InsertError)(messageStruct* const me,uint8_t data),
-		void(*InsertDistance)(messageStruct* const me,float  hcSr04,uint16_t vl53l0x),
+		void(*InsertDistance)(messageStruct* const me,uint32_t  hcSr04,uint16_t vl53l0x),
 		void(*InsertDistanceWithPosition)(messageStruct* const me,uint32_t  hcSr04,uint16_t vl53l0x,uint8_t position),
 		void(*InsertIrSensor)(messageStruct* const me,uint32_t value),
 		void(*InsertAdcBatteryVoltage)(messageStruct* const me,uint32_t value),
-		void(*SendMessage)(messageStruct* const me)){
+		void(*SendMessage)(messageStruct* const me),
+		void(*SendDriveStatus)(messageStruct* const me,uint8_t status)){
 	me->buffer=CircularBuffer_Create();
 	me->Insert=Insert;
 	me->InsertError=InsertError;
@@ -37,6 +39,7 @@ void Message_Init(messageStruct* const me,
 	me->InsertIrSensor=InsertIrSensor;
 	me->InsertAdcBatteryVoltage=InsertAdcBatteryVoltage;
 	me->SendMessage=SendMessage;
+	me->SendDriveStatus=SendDriveStatus;
 }
 
 void Message_Insert(messageStruct* const me,uint8_t data){
@@ -49,7 +52,7 @@ void Message_InsertError(messageStruct* const me,uint8_t data){
 	me->buffer->insert(me->buffer,0xFE);
 	me->buffer->insert(me->buffer,0xFE);
 }
-void Message_InsertDistance(messageStruct* const me,float  hcSr04,uint16_t vl53l0x){
+void Message_InsertDistance(messageStruct* const me,uint32_t  hcSr04,uint16_t vl53l0x){
 	uint8_t *tempArrayHc5r04=(uint8_t*)(&hcSr04);
 	me->buffer->insert(me->buffer,0xFF);
 	me->buffer->insert(me->buffer,MEASURE_DISTANCE_FUN_RECEIVED);
@@ -106,4 +109,11 @@ void Message_SendMessage(messageStruct* const me){
 			  HAL_UART_Transmit_DMA(me->huart, uartBufferPointer, uartBufferLength);
 		  }
 	  }
+}
+void Message_SendDriveStatus(messageStruct* const me,uint8_t status){
+	me->buffer->insert(me->buffer,0xFF);
+	me->buffer->insert(me->buffer,SEND_DRIVE_STATUS);
+	me->buffer->insert(me->buffer,status);
+	me->buffer->insert(me->buffer,0xFE);
+	me->buffer->insert(me->buffer,0xFE);
 }

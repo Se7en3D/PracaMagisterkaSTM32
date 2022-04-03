@@ -107,11 +107,6 @@ void vl53l0x_StructInit(StructVl53l0x* me,
 uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 		uint8_t tempValue=0;
 	 // check model ID register (value specified in datasheet)
-		uint8_t Id=vl53l0x_ReadReg(me,IDENTIFICATION_MODEL_ID);
-		  if (Id != 0xEE) {
-			  addErrorValue(VL5310X_IncorrectModelID);
-			  return 0;
-		  }
 		  if(me->xshutPort!=NULL){
 			  HAL_GPIO_WritePin(me->xshutPort, me->xshutPin,GPIO_PIN_RESET);
 			  HAL_Delay(20);
@@ -120,6 +115,12 @@ uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 		  }else{
 			  addErrorValue(VL5310X_IncorrectTypeVcselperiodType);
 		  }
+
+		uint8_t Id=vl53l0x_ReadReg(me,IDENTIFICATION_MODEL_ID);
+		if (Id != 0xEE) {
+			addErrorValue(VL5310X_IncorrectModelID);
+			return 0;
+		}
 
 		  // VL53L0X_DataInit() begin
 
