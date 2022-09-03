@@ -13,9 +13,10 @@
 #include "connectionModule.h"
 #include "hc-sr04.h"
 #include "vl5310x.h"
+#include "irSensor.h"
 
 static const volatile servoPR_Position connectionMovementAngleArray[drivingStatusSizeFirstDimension][drivingStatusSizeSecondDimension]={
-		{servoPRPosition5,'\0'},	//IDLE_DRIVING
+		{servoPRPosition5,'\0'},	/*IDLE_DRIVING*/
 		{servoPRPosition10,servoPRPosition9,servoPRPosition8,servoPRPosition7,'\0'}, //GO_UP_LEFT
 		{servoPRPosition1,servoPRPosition2,servoPRPosition3,servoPRPosition4,'\0'},	//GO_UP_RIGHT
 		{servoPRPosition4,servoPRPosition5,servoPRPosition6,'\0'},	//GO_UP
@@ -33,8 +34,64 @@ static void (*measurmentStatusFunction[measurmentStatusFunctionArreySize])(servo
 		&connectionModuleFunctionMeasurmentSend,
 };
 
+void connectionModuleDecodeMessage(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR){
+	if(uartComIsFrameToDecode()){
+		  uint8_t function=uartComGetFunctionFromInputFrame();
+		  if(connectionModuleCheckCollisionByIrSensor(function)){
+			  stateMachineSetStopManualDriving();
+		  }else{
+			  stateMachineResetStopManualDriving();
+		  }
+		  switch(function){
+			  case RIDE_FORWARD_FUN:/*Jazda w kierunku do przodu*/
+				  stateMachineDrivingForward();
+				  break;
+			  case RIDE_BACKWARD_FUN:
+				  stateMachineDrivingBack();
+				  break;
+			  case RIDE_RIGHT_FUN:
+				  stateMachineDrivingRight();
+				  break;
+			  case RIDE_LEFT_FUN:
+				  stateMachineDrivingLeft();
+				  break;
+			  case ROTATE_LEFT:
+				  stateMachineRotateLeft();
+				  break;
+			  case ROTATE_RIGHT:
+				  stateMachineRotateRight();
+				  break;
+			  case RIDE_BACKWARD_RIGHT:
+				  stateMachineRotateBackRight();
+				  break;
+			  case RIDE_BACKWARD_LEFT:
+				  stateMachineRotateBackLeft();
+				  break;
+			  case STOP_FUN:
+				  stateMachineStopDriving();
+				  break;
+			  case MEASURE_DISTANCE_FUN: //Wykonanie pomiaru odległości Brak w najnowszej wersji
+
+				  break;
+			  case CALIBRATION_PWM_DATA:
+				  //servo360NewDataPWM(framepointer);
+				  break;
+			  case UNIMPORTANT_ERROR: //Brak żadnych komend
+				  break;
+			  default:
+					  //JAKIŚ ERROR?
+					 stateMachineStopDriving();
+				  break;
+			  }
+		  uartComClearFrame();
+	}
+}
+
 void connectionModuleDrivingStatusWithPositionServo(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR){
 	if(servoPRReadyToChangeAngle(servoPR)){
+		if(stateMachineIsManualDriving()){
+			return;
+		}
 		uint8_t positionFirstDimension=stateMachineGetDrivingStatus(drivingStructure);
 		uint8_t positionSecondDimension=servoAndStateMachine->numberForTabPositionByDriving;
 		if(stateMachineDrabingsStatusIsEqual(drivingStructure)){
@@ -65,22 +122,6 @@ void connectionModuleDrivingStatusWithPositionServo(connectionBetweenServo360And
 		servoAndStateMachine->numberForTabPositionByDriving=positionSecondDimension;
 
 	}
-	/*
-	if(servo360Structure.status==servo360_IDLE){ //Tylko gdy status serva jest IDLE
-		if(drivingStatus!=connectionBetweenServo360AndStateMachine.prevDrivingStatus){ //Sprawdzenie czy wcześniejszy status jest identyczny
-			connectionBetweenServo360AndStateMachine.numberForTabPositionByDriving=0;
-		}
-
-		servo360_Position positionFromtable=tabPositionByDriving[drivingStatus][connectionBetweenServo360AndStateMachine.numberForTabPositionByDriving];
-		if(positionFromtable==servo360_PositionNone){
-			connectionBetweenServo360AndStateMachine.numberForTabPositionByDriving=0;
-		}else{
-			//printf("P=%d\n",positionFromtable);
-			servo360SetTargetPosition(positionFromtable);
-			connectionBetweenServo360AndStateMachine.numberForTabPositionByDriving++;
-		}
-		connectionBetweenServo360AndStateMachine.prevDrivingStatus=drivingStatus;
-	}*/
 }
 
 void connectionModuleaddTimeout(measurmentStructure_t *measureS){
@@ -160,5 +201,41 @@ void connectionModuleClearMeasurmentStatus(measurmentStructure_t *measurmentStru
 	measurmentStructure->isDistanceVl5310xLock=connectionModuleUnlockDistance;
 	measurmentStructure->timeout=0;
 	measurmentStructure->measurmentStatus=connectionModuleMeasurment_Idle;
+}
+
+uint8_t connectionModuleCheckCollisionByIrSensor(const uint8_t function){
+	uint8_t collision=irSensorGetHexValueFromAllCollision();
+	uint8_t mask=0x00;
+	switch(function){
+			  case RIDE_FORWARD_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1|IR_SENSOR_MASK_FOR_IR_NR2|IR_SENSOR_MASK_FOR_IR_NR3);
+				  break;
+			  case RIDE_BACKWARD_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR6|IR_SENSOR_MASK_FOR_IR_NR7);
+				  break;
+			  case RIDE_RIGHT_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1|IR_SENSOR_MASK_FOR_IR_NR2);
+				  break;
+			  case RIDE_LEFT_FUN:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR2|IR_SENSOR_MASK_FOR_IR_NR3);
+				  break;
+			  case ROTATE_LEFT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR3);
+				  break;
+			  case ROTATE_RIGHT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR1);
+				  break;
+			  case RIDE_BACKWARD_RIGHT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR7);
+				  break;
+			  case RIDE_BACKWARD_LEFT:
+				  mask|=(IR_SENSOR_MASK_FOR_IR_NR6);
+				  break;
+	}
+	if((collision&mask)==0x00){
+		return FALSE;
+	}else{
+		return TRUE;
+	}
 }
 

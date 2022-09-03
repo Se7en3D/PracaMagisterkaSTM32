@@ -25,16 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
-#include <vl5310x.h>
-#include "hc-sr04.h"
-#include "uartCom.h"
-#include "errorCode.h"
-#include "stateMachine.h"
-#include "irSensor.h"
-#include "adc.h"
-#include "servoPR.h"
-#include "connectionModule.h"
-#include "servoPR.h"
+#include "Car.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,14 +54,14 @@ uint8_t bufor;
 ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 #pragma location=0x30040060
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-#pragma location=0x30040200
+#pragma location=0x300400c0
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffers */
 
 #elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
 __attribute__((at(0x30040000))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
 __attribute__((at(0x30040060))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-__attribute__((at(0x30040200))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
+__attribute__((at(0x300400c0))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffer */
 
 #elif defined ( __GNUC__ ) /* GNU Compiler */
 
@@ -122,16 +113,7 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int __io_putchar(int ch)
-{
-  if (ch == '\n') {
-    __io_putchar('\r');
-  }
 
-  //HAL_UART_Transmit(&huart4, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
-  uartComPush(ch);
-  return 1;
-}
 /* USER CODE END 0 */
 
 /**
@@ -205,186 +187,65 @@ Error_Handler();
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-  	  /*Moduł inicjalizacji modułów*/
-  errorCodeInit();
-  hcsr04Tim2_p=&(hcsr04_t){0,0,0,0.0,0};
-  uartCommunication_p=&(uartCommunication_t){&huart4,{0},{0},0,0};
-  stateMachineInit(&htim12,GPIOE,GPIO_PIN_2,GPIO_PIN_3,GPIO_PIN_4,GPIO_PIN_5);
-  uartComSensorInit(&htim13);
-  servoPRInit(&servoPRGeneralStructure,&htim13,TIM_CHANNEL_1);
-  	  /*Inizjalizacja peryfreriów przy pomocy biblioteki HAL */
-  HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_1);
-  HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
-  HAL_TIM_Base_Start_IT(&htim2);
-  HAL_TIM_Base_Start_IT(&htim17);
-  HAL_UART_Receive_IT(&huart4,&uartCommunication_p->bufforReceived[0],SIZE_BUFFOR_RECEIVED);
-  HAL_TIM_Base_Start(&htim12);
-  HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_2);
-  HAL_TIM_Base_Start_IT(&htim7);
-	  /*inicjalizacja pozostałych modłów przy pomocy własnych bibliotek*/
-  vl53l0xSetAddress(0x52);
-  vl53l0xSetI2c(&hi2c1);
-  vl53l0xSetXshut(VL53L0X_XSHUT_GPIO_Port, VL53L0X_XSHUT_Pin);
-  vl53l0xSetGpio(VL53L0X_GPIO1_GPIO_Port, VL53L0X_GPIO1_Pin);
-  vl53l0xInit();
-  vl53l0xGetVcselPulsePeriod(VcselPeriodPreRange);
-  vl53l0xStartContinuous(0);
+  /*Car_Create(&huart4,
+		  &htim7,
+		  &htim2,
+		  &hadc1,
+		  OPTOCOUPLER_POWER_ON_GPIO_Port,
+		  OPTOCOUPLER_POWER_ON_Pin,
+		  &hi2c1,
+		  VL53L0X_XSHUT_GPIO_Port,
+		  VL53L0X_XSHUT_Pin,
+		  &htim13,
+		  TIM_CHANNEL_1);
+  Car_AddIrSensor(IR_NR_1_GPIO_Port,IR_NR_1_Pin);
+  Car_AddIrSensor(IR_NR_2_GPIO_Port,IR_NR_2_Pin);
+  Car_AddIrSensor(IR_NR_3_GPIO_Port,IR_NR_3_Pin);
+  Car_AddIrSensor(IR_NR_4_GPIO_Port,IR_NR_4_Pin);
+  Car_AddIrSensor(IR_NR_5_GPIO_Port,IR_NR_5_Pin);
+  Car_AddIrSensor(IR_NR_6_GPIO_Port,IR_NR_6_Pin);
+  Car_AddIrSensor(IR_NR_7_GPIO_Port,IR_NR_7_Pin);
+  Car_AddIrSensor(IR_NR_8_GPIO_Port,IR_NR_8_Pin);*/
+  CarTestModule=Car_Create(&htim7);
+  if(CarTestModule!=NULL){
+	  CarTestModule->createOutMessage(CarTestModule,
+			  	  	  	  	  	  	  &huart4);
+	  CarTestModule->createInMessage(CarTestModule);
+	  CarTestModule->createBatteryVoltage(CarTestModule,
+			  	  	  	  	  	  	  	  &hadc1,
+										  OPTOCOUPLER_POWER_ON_GPIO_Port,
+										  OPTOCOUPLER_POWER_ON_Pin);
+	  CarTestModule->createServoPR(CarTestModule,
+			  	  	  	  	  	  &htim13,
+								  TIM_CHANNEL_1);
+	  CarTestModule->createHcSr04(CarTestModule,
+			  	  	  	  	  	  &htim2);
+	  CarTestModule->createVl53l0x(CarTestModule,
+			  	  	  	  	  	  	 &hi2c1,
+									 VL53L0X_XSHUT_GPIO_Port,
+									 VL53L0X_XSHUT_Pin);
+	  CarTestModule->createIrSensor(CarTestModule);
+	  CarTestModule->createMotorControl(CarTestModule,GPIOE,GPIO_PIN_2,GPIO_PIN_3,GPIO_PIN_4,GPIO_PIN_5,&htim12,TIM_CHANNEL_1,TIM_CHANNEL_2);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_1_GPIO_Port,IR_NR_1_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_2_GPIO_Port,IR_NR_2_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_3_GPIO_Port,IR_NR_3_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_4_GPIO_Port,IR_NR_4_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_5_GPIO_Port,IR_NR_5_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_6_GPIO_Port,IR_NR_6_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_7_GPIO_Port,IR_NR_7_Pin);
+	  CarTestModule->irSensor->addGPIO(CarTestModule->irSensor,IR_NR_8_GPIO_Port,IR_NR_8_Pin);
+	  HAL_TIM_Base_Start_IT(&htim7);
+  }else{
+	  while(1){
 
-  	  /*inicjalizacja potrów od czujników odległości na podczerwień */
-  irSensorInitIrPinout(IR_NR1_NUMBER,IR_NR_1_Pin,IR_NR_1_GPIO_Port);
-  irSensorInitIrPinout(IR_NR2_NUMBER,IR_NR_2_Pin,IR_NR_2_GPIO_Port);
-  irSensorInitIrPinout(IR_NR3_NUMBER,IR_NR_3_Pin,IR_NR_3_GPIO_Port);
-  irSensorInitIrPinout(IR_NR4_NUMBER,IR_NR_4_Pin,IR_NR_4_GPIO_Port);
-  irSensorInitIrPinout(IR_NR5_NUMBER,IR_NR_5_Pin,IR_NR_5_GPIO_Port);
-  irSensorInitIrPinout(IR_NR6_NUMBER,IR_NR_6_Pin,IR_NR_6_GPIO_Port);
-  irSensorInitIrPinout(IR_NR7_NUMBER,IR_NR_7_Pin,IR_NR_7_GPIO_Port);
-  irSensorInitIrPinout(IR_NR8_NUMBER,IR_NR_8_Pin,IR_NR_8_GPIO_Port);
-
-  adcInit(&hadc1,OPTOCOUPLER_POWER_ON_GPIO_Port,OPTOCOUPLER_POWER_ON_Pin);
+	  }
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
-	  irSensorReadStatusIrSensor(); //Pobranie statusu portów czujników IR
-
-	  uint8_t* framepointer=uartComGetFrame();
-	  if(framepointer!=0){
-		  switch(framepointer[FUNCTIONPOSITION]){
-		  case RIDE_FORWARD_FUN:
-			  stateMachineDrivingForward();
-			  break;
-		  case RIDE_BACKWARD_FUN:
-			  stateMachineDrivingBack();
-			  break;
-		  case RIDE_RIGHT_FUN:
-			  stateMachineDrivingRight();
-			  break;
-		  case RIDE_LEFT_FUN:
-			  stateMachineDrivingLeft();
-			  break;
-		  case ROTATE_LEFT:
-			  stateMachineRotateLeft();
-			  break;
-		  case ROTATE_RIGHT:
-			  stateMachineRotateRight();
-			  break;
-		  case RIDE_BACKWARD_RIGHT:
-			  stateMachineRotateBackRight();
-			  break;
-		  case RIDE_BACKWARD_LEFT:
-			  stateMachineRotateBackLeft();
-			  break;
-		  case STOP_FUN:
-			  stateMachineStopDriving();
-			  break;
-		  case MEASURE_DISTANCE_FUN: //Wykonanie pomiaru odległości Brak w najnowszej wersji
-
-			  break;
-		  case CALIBRATION_PWM_DATA:
-			  //servo360NewDataPWM(framepointer);
-			  break;
-		  case UNIMPORTANT_ERROR: //Brak żadnych komend
-			  break;
-		  default:
-				  //JAKIŚ ERROR?
-				 stateMachineStopDriving();
-			  break;
-		  }
-		  uartComClearFrame();
-	  }
-	  connectionModuleDrivingStatusWithPositionServo(&connectionBetweenServo360AndStateMachine,&drivingStructure,&servoPRGeneralStructure);
-	  connectionModuleMeasureDistance(&servoPRGeneralStructure,&measurmentStructure);
-
-	  //driving_status_t drivingStatusTemp=stateMachineGetDrivingStructure().drivingStatus;
-	  /*if(drivingStructure.drivingStatus!=IDLE_DRIVING){
-		  if(drivingStructure.drivingStatus!=STOP_DRIVING){ //Pomiar pracy podczas jazdy
-			  //if(uartComSensorFrame.waitForData){
-				  float distanceUltra=hcsr04GetCelculatedValue();
-				  if(distanceUltra!=0.0){
-					  uint16_t distancevl5310x=vl53l0xReadRangeContinuousMillimeters();
-					  uartComSendDistanceServo(distanceUltra, distancevl5310x);
-					  //uartComServoClearWaitForData();
-				  }
-			  //}
-			  //uartComServoIsShiftPosition(); //Próba przemieszenia serwomechanizmu do następnej pozycji
-
-			  if(uartComGetMeasureForMeasureDistanceFun()!=0){
-				  uartComResetMeasureForMeasureDistanceFun();
-			  }
-		  }else{ //Pomiar dystansu na polecenie specjalne
-				float distanceUltra=hcsr04GetCelculatedValue();
-				if(distanceUltra!=0.0){
-					uint16_t distancevl5310x=vl53l0xReadRangeContinuousMillimeters();
-					uartComSendDistance(distanceUltra, distancevl5310x);
-					uartComAddMeasureForMeasureDistanceFun();
-				}
-			  if(uartComGetMeasureForMeasureDistanceFun()>MAX_MEASURMENT_SENSOR){
-				  uartComResetMeasureForMeasureDistanceFun();
-				  stateMachineMeasureDistanceEnd();
-			  }
-		  }
-
-	  }*/
-	  	 //Reset licznika od powtórzenia polecenia kierunku jazdy
-	  if(stateMachineGetResetTimer()){
-		  stateMachineResetTimer();
-		  if(HAL_TIM_Base_GetState(&htim17)==HAL_TIM_STATE_READY){ //Sprawdzenie czy timer został zastopowany i wymaga ponownego uruchomienia
-			  HAL_TIM_Base_Start(&htim17);
-		  }else{
-			  __HAL_TIM_SET_COUNTER(&htim17, 0);
-		  }
-	  }
-
-
-	  //switch()
-	  //Sprawdzenie czy należy uruchomić pomiar ADC
-	  /*if(adcGetTime()>=ADC_TIME_TO_START_CONVERSION){
-		  HAL_ADC_Start_IT(&hadc1);
-		  adcClearTime();
-	  }
-
-	  //uint32_t convValue=adcGetConversionValue();
-	  if(adcReadyToSendData()==ADC_READY_TO_SEND){
-		  uint32_t value=adcGetConversionValue();
-		  uartComSendAdcBatteryVoltage(value);
-	  }*/
-
-	  switch(adcStage()){
-	 // case ADC_START_CONVERSION:
-		//  HAL_ADC_Start_IT(&hadc1);
-		//  break;
-	  case ADC_READY_TO_SEND:
-		  uartComSendAdcBatteryVoltage(adcGetValue());
-		  break;
-	  default:
-		  break;
-	  }
-
-
-	  servoPRExecuteStatusFunction(&servoPRGeneralStructure);
-
-
-	  	  //Sprawdzenie czy znajdują się jakieś błedy do wysłania
-	  uint8_t errorCode=errorCodePop();
-	  if(errorCode!=UNIMPORTANT_ERROR){
-		 uartComSendErrorCode(errorCode);
-	  }
-
-	  	  //Sprawdzenie czy DMA od komunikacji PC<->STM32 jest już dostepne do wyłsania kolejnych pakietów danych
-	  if(hdma_uart4_tx.State==HAL_DMA_STATE_READY){
-		  uint8_t *uartBufferPointer=uartComGetBufferFirstElementAddress();
-		  uint32_t uartBufferLength=uartComGetBufferLength();
-		  if(uartBufferLength!=0){
-			  HAL_UART_Transmit_DMA(&huart4, uartBufferPointer, uartBufferLength);
-		  }
-	  }
-	  if(irSensorGetTime()>TIME_TO_SEND_STATUS_IR){
-		  uartComSendIrSensorStatus(irSensorGetAllCollision(),MAX_SENSOR_IR);
-		  irSensorClearTime();
-	  }
+	  Car_mainFun(CarTestModule);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -502,7 +363,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -553,16 +414,19 @@ static void MX_ETH_Init(void)
 
   /* USER CODE END ETH_Init 0 */
 
+   static uint8_t MACAddr[6];
+
   /* USER CODE BEGIN ETH_Init 1 */
 
   /* USER CODE END ETH_Init 1 */
   heth.Instance = ETH;
-  heth.Init.MACAddr[0] =   0x00;
-  heth.Init.MACAddr[1] =   0x80;
-  heth.Init.MACAddr[2] =   0xE1;
-  heth.Init.MACAddr[3] =   0x00;
-  heth.Init.MACAddr[4] =   0x00;
-  heth.Init.MACAddr[5] =   0x00;
+  MACAddr[0] = 0x00;
+  MACAddr[1] = 0x80;
+  MACAddr[2] = 0xE1;
+  MACAddr[3] = 0x00;
+  MACAddr[4] = 0x00;
+  MACAddr[5] = 0x00;
+  heth.Init.MACAddr = &MACAddr[0];
   heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
   heth.Init.TxDesc = DMATxDscrTab;
   heth.Init.RxDesc = DMARxDscrTab;
@@ -1088,54 +952,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
-	if(htim==&htim7){
-		irSensorAddTime();
-		adcAddTime();
-		connectionModuleaddTimeout(&measurmentStructure);
-		servoPRAddTime(&servoPRGeneralStructure);
-	}
-	if(htim==&htim13){
 
-	}
-	if(htim==&htim17){
-		stateMachineTimeout();
-		HAL_TIM_Base_Stop(&htim17);
-	}
-	if(htim==&htim2){
-		if ((htim->Instance->CCMR1 & TIM_CCMR1_CC1S) != 0x00U){
-			hcsr04CompCH1Add(HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1));
-		}
-
-		if ((htim->Instance->CCMR1 & TIM_CCMR1_CC2S) != 0x00U){
-			hcsr04CompCH2Add(HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2));
-		}
-	}
-}
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle){
-	if(UartHandle==&huart4){
-		uint8_t *pointer=UartHandle->pRxBuffPtr-1;
-		int i=&uartCommunication_p->bufforReceived[SIZE_BUFFOR_RECEIVED-1]-pointer;
-		while((pointer+i) <= &uartCommunication_p->bufforReceived[SIZE_BUFFOR_RECEIVED-1] && i<SIZE_BUFFOR_RECEIVED){
-			uartComAddFrame(uartCommunication_p->bufforReceived[i]);
-			i++;
-
-		}
-		HAL_UART_Receive_IT(&huart4,&uartCommunication_p->bufforReceived[0],SIZE_BUFFOR_RECEIVED);
-	}
-}
-
-void HAL_I2C_MasterRxCpltCallback (I2C_HandleTypeDef * hi2c){
-	printf(" 0x%X",bufor);
-	//HAL_I2C_Master_Receive_IT (&hi2c1, VL53L0X_ADDRESS, &bufor, 1);
-}
-
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-	if(hadc==&hadc1){
-		uint32_t result = HAL_ADC_GetValue(&hadc1);
-		adcSetConversionValue(result);
-	}
-}
 /* USER CODE END 4 */
 
 /**
@@ -1170,4 +987,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

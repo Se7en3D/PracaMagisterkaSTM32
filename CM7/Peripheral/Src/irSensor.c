@@ -86,4 +86,12 @@ void irSensorAddSample(ir_sensor_t *irSensor,const uint8_t sensorId,const uint8_
 		irSensor->collision[sensorId]=IR_SENSOR_NOT_DETECTED_COLLISION;
 	}
 }
-
+uint32_t irSensorGetHexValueFromAllCollision(){
+	uint32_t value=0;
+	for(int i=0;i<MAX_SENSOR_IR;i++){
+		if(irSensor.collision[i]){
+			value|=(1<<i);
+		}
+	}
+	return value;
+}

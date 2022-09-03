@@ -92,6 +92,8 @@ void uartComAddFrame(uint8_t data);
   */
 uint8_t* uartComGetFrame();
 void uartComClearFrame();
+uint8_t uartComIsFrameToDecode();
+uint8_t uartComGetFunctionFromInputFrame();
 void uartComSendDistance(float hcSr04, uint16_t vl5310x);
 void uartComSendDistanceServo(float hcSr04, uint16_t vl5310x,uint16_t position);
 void uartComSendErrorCode(uint8_t errorCode);

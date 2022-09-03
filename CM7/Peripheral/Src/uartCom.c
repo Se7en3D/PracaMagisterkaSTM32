@@ -67,6 +67,26 @@ void uartComClearFrame(){
 		uartCommunication_p->positionCommand=0;
 	}
 }
+uint8_t uartComIsFrameToDecode(){
+	if(uartCommunication_p==0){
+		return FALSE;
+	}
+	if(uartCommunication_p->detectedCommand==0){
+		return FALSE;
+	}else{
+		return TRUE;
+	}
+}
+uint8_t uartComGetFunctionFromInputFrame(){
+	if(uartCommunication_p==0){
+		return FALSE;
+	}
+	if(uartCommunication_p->detectedCommand==0){
+		return FALSE;
+	}else{
+		return uartCommunication_p->frameCommand[FUNCTIONPOSITION];
+	}
+}
 
 void uartComSendDistance(float hc5r04, uint16_t vl5310x){ //float-32bit uint16_t-16bit
 	if(uartCommunication_p==0){
@@ -136,9 +156,9 @@ void uartComSendAdcBatteryVoltage(uint32_t value){
 		return ;
 	}
 
-	if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
+	/*if(value>>24>=0xFF){ //TODO sprawdzić dlaczego niekidy jest wartość FULL
 		return;
-	}
+	}*/
 	uartComPush(0xFF);
 	uartComPush(SEND_BATTERY_MEASURMENT_VALUE);
 	uartComPush(value>>24);

@@ -38,16 +38,17 @@ typedef struct{
 	uint8_t isDistanceVl5310xLock;
 	int timeout;
 	connectionModuleMeasurmentStatus measurmentStatus;
-
 }measurmentStructure_t;
 
 measurmentStructure_t measurmentStructure;
+
 typedef struct{
 	uint8_t numberForTabPositionByDriving;
 	int adder;
 }connectionBetweenServo360AndStateMachine_t;
 
 connectionBetweenServo360AndStateMachine_t  connectionBetweenServo360AndStateMachine;
+void connectionModuleDecodeMessage(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR);
 void connectionModuleDrivingStatusWithPositionServo(connectionBetweenServo360AndStateMachine_t *servoAndStateMachine ,driving_structure_t *drivingStructure,servoPR_GeneralStructure * servoPR);
 void connectionModuleaddTimeout(measurmentStructure_t *measureS);
 void connectionModuleMeasureDistance(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
@@ -55,3 +56,4 @@ void connectrionModuleFunctionMeasurmentIdle(servoPR_GeneralStructure * servoPR,
 void connectionModuleFunctionMeasurmentWait(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
 void connectionModuleFunctionMeasurmentSend(servoPR_GeneralStructure * servoPR,measurmentStructure_t *measureS);
 void connectionModuleClearMeasurmentStatus(measurmentStructure_t *measurmentStructure);
+uint8_t connectionModuleCheckCollisionByIrSensor(const uint8_t function);

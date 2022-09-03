@@ -19,16 +19,24 @@
 #define IR_NR6_NUMBER 5
 #define IR_NR7_NUMBER 6
 #define IR_NR8_NUMBER 7
+#define IR_SENSOR_MASK_FOR_IR_NR1 0x01
+#define IR_SENSOR_MASK_FOR_IR_NR2 0x02
+#define IR_SENSOR_MASK_FOR_IR_NR3 0x04
+#define IR_SENSOR_MASK_FOR_IR_NR4 0x08
+#define IR_SENSOR_MASK_FOR_IR_NR5 0x10
+#define IR_SENSOR_MASK_FOR_IR_NR6 0x20
+#define IR_SENSOR_MASK_FOR_IR_NR7 0x30
+#define IR_SENSOR_MASK_FOR_IR_NR8 0x40
 #define IR_SENSOR_DOES_NOT_EXIST 0
 #define IR_SENSOR_NOT_DETECTED_COLLISION 0
 #define IR_SENSOR_DETECTED_COLLISION 1
 #define IR_SENSOR_EXIST 1
 #define TIME_TO_SEND_STATUS_IR 500 //czas(ms) do wysłania statusu od sensorów podczerwieni
 #define IRSENSOR_TIME_TO_READ_GPIO 10
-#define	IRSENSOR_COLLISION_NEGATION 0
+#define	IRSENSOR_COLLISION_NEGATION 1
 #define IRSENSOR_MAX_SAMPLE 5 //Maksymalna wielkość tablicy pobierającej stany wejścia pinu potrzebna do określania dominanty
 
-volatile static int IrSensorExist[MAX_SENSOR_IR]={
+volatile static uint8_t IrSensorExist[MAX_SENSOR_IR]={
 		IR_SENSOR_EXIST,
 		IR_SENSOR_EXIST,
 		IR_SENSOR_EXIST,
@@ -61,7 +69,7 @@ void irSensorAddTime();
 uint32_t irSensorGetTime();
 void irSensorClearTime();
 void irSensorAddSample(ir_sensor_t *irSensor,const uint8_t sensorId,const uint8_t value);
-
+uint32_t irSensorGetHexValueFromAllCollision();
 
 
 #endif /* INC_IRSENSOR_H_ */
