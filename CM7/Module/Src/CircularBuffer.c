@@ -38,7 +38,7 @@ void CircularBuffer_Init(CircularBufferStruct* const me,
 	me->insert = insert;
 	me->getData = getData;
 	me->show = show;
-	me->getDataFromDMA=getDataFromDMA;
+	me->getDataToDMA=getDataFromDMA;
 }
 uint32_t CircularBuffer_isFull(CircularBufferStruct* const me) {
 	uint32_t next = me->head + 1;

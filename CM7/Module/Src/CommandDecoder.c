@@ -40,7 +40,7 @@ void CommandDecoder_Init(bluetoothDecoderStruct* const me,
 	me->StatusFunction[decoder_Idle]=CommandDecoder_StatusIdle;
 	me->StatusFunction[decoder_WaitToEnd]=CommandDecoder_StatusWaitToEnd;
 	me->StatusFunction[decoder_EndDecod]=CommandDecoder_StatusEndDecod;
-	me->DecodeTheFunction=DecodeTheFunction;
+	me->DecodeFunction=DecodeTheFunction;
 
 }
 

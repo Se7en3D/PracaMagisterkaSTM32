@@ -13,7 +13,7 @@ struct CircularBufferStruct {
 	void (*insert)(CircularBufferStruct* const me, circ_t value);
 	circ_t* (*getData)(CircularBufferStruct* const me);
 	void (*show)(CircularBufferStruct* const me);
-	circ_t* (*getDataFromDMA)(CircularBufferStruct* const me);
+	circ_t* (*getDataToDMA)(CircularBufferStruct* const me);
 };
 
 

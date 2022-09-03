@@ -77,8 +77,8 @@ struct carModule{
 	carModuleModeDriving modeDriving;
 	uint8_t ReceivedInMessageBuff;
 	TIM_HandleTypeDef* timer1ms;
-	uint32_t timerMeasureBatteryVoltage;
-	uint32_t timerToSendIrSensorStatus;
+	uint32_t timeToMeasureBatteryVoltage;
+	uint32_t timeToSendIrSensorStatus;
 	uint32_t timeToResetMotorControl;
 	functionFromPcEnum driveStatus;
 	uint8_t measureDistanceForPcCount;
@@ -95,7 +95,7 @@ struct carModule{
 	void (*createBatteryVoltage)(carModule *me,ADC_HandleTypeDef* adcBattery,GPIO_TypeDef* gpioBattery,uint16_t pinBattery);
 	void (*createServoPR)(carModule *me,TIM_HandleTypeDef *PWMtimerGen,uint32_t TimChannel);
 	void (*createHcSr04)(carModule *me,TIM_HandleTypeDef* timerHcSr04);
-	void (*createVl54l0x)(carModule *me,I2C_HandleTypeDef * hi2cVl53l0,GPIO_TypeDef *xshutgpio,uint16_t xshutpin);
+	void (*createVl53l0x)(carModule *me,I2C_HandleTypeDef * hi2cVl53l0,GPIO_TypeDef *xshutgpio,uint16_t xshutpin);
 	void (*createIrSensor)(carModule *me);
 	void (*createMotorControl)(carModule *me,GPIO_TypeDef *outGPIO,uint16_t pinOut1,uint16_t pinOut2,uint16_t pinOut3,uint16_t pinOut4,TIM_HandleTypeDef *timerControlMotor,uint8_t channelEnA,uint8_t channelEnB);
 };

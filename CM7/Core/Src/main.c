@@ -220,7 +220,7 @@ Error_Handler();
 								  TIM_CHANNEL_1);
 	  CarTestModule->createHcSr04(CarTestModule,
 			  	  	  	  	  	  &htim2);
-	  CarTestModule->createVl54l0x(CarTestModule,
+	  CarTestModule->createVl53l0x(CarTestModule,
 			  	  	  	  	  	  	 &hi2c1,
 									 VL53L0X_XSHUT_GPIO_Port,
 									 VL53L0X_XSHUT_Pin);

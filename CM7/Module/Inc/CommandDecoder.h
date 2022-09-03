@@ -47,7 +47,7 @@ struct bluetoothDecoderStruct{
 	void (*ClearBuffer)(bluetoothDecoderStruct* const me);
 	void (*AddTimeout)(bluetoothDecoderStruct* const me);
 	void (*StatusFunction[3])(bluetoothDecoderStruct* const me, const uint8_t value);
-	uint8_t (*DecodeTheFunction)(bluetoothDecoderStruct* const me);
+	uint8_t (*DecodeFunction)(bluetoothDecoderStruct* const me);
 };
 
 bluetoothDecoderStruct* CommandDecoder_Create();

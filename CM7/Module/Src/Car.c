@@ -348,8 +348,8 @@ carModule* Car_Create(TIM_HandleTypeDef* timer1ms){
 		me->autoDriveVariable.selectedLargerPosition=0;
 		me->ReceivedInMessageBuff=0;
 		me->timer1ms=timer1ms;
-		me->timerMeasureBatteryVoltage=0;
-		me->timerToSendIrSensorStatus=0;
+		me->timeToMeasureBatteryVoltage=0;
+		me->timeToSendIrSensorStatus=0;
 		me->driveStatus=RESET_DRIVE;
 		me->measureDistanceForPcCount=0;
 		me->rangeMeasurmentControl=RangeMeasurment_Create();
@@ -380,7 +380,7 @@ void Car_Init(carModule *me,
 	me->createBatteryVoltage=createBatteryVoltage;
 	me->createServoPR=createServoPR;
 	me->createHcSr04=createHcSr04;
-	me->createVl54l0x=createVl54l0x;
+	me->createVl53l0x=createVl54l0x;
 	me->createIrSensor=createIrSensor;
 	me->createMotorControl=createMotorControl;
 }
@@ -401,7 +401,7 @@ void Car_CreateHcSr04(carModule *me,TIM_HandleTypeDef* timerHcSr04){
 	me->rangeMeasurmentControl->createHcSr04(me->rangeMeasurmentControl,timerHcSr04);
 }
 void Car_CreateVl54l0x(carModule *me,I2C_HandleTypeDef * hi2cVl53l0,GPIO_TypeDef *xshutgpio,uint16_t xshutpin){
-	me->rangeMeasurmentControl->createVl54l0x(me->rangeMeasurmentControl,hi2cVl53l0,xshutgpio,xshutpin);
+	me->rangeMeasurmentControl->createVl53l0x(me->rangeMeasurmentControl,hi2cVl53l0,xshutgpio,xshutpin);
 }
 void Car_AddIrSensor(carModule *me,GPIO_TypeDef *gpio, uint16_t pin){
 	me->irSensor->addGPIO(me->irSensor,gpio,pin);
@@ -417,7 +417,7 @@ void Car_mainFun(carModule *me){
 					/*Odbieranie komend z komputera PC*/
 	uint8_t *pointerToCommunicationFunction=me->inMessage->GetFunction(me->inMessage);
 	if(pointerToCommunicationFunction){
-		functionFromPcEnum decodeStatus=(uint8_t) me->inMessage->DecodeTheFunction(me->inMessage);
+		functionFromPcEnum decodeStatus=(uint8_t) me->inMessage->DecodeFunction(me->inMessage);
 		if(decodeStatus<(driveFunctionLength)){
 			//driveFunction[decodeValue](me);
 			CarTestModule->timeToResetMotorControl=0;
@@ -437,9 +437,9 @@ void Car_mainFun(carModule *me){
 		CarTestModule->motorControl->resetDriving(CarTestModule->motorControl);
 	}
 				/*Obsługa modułu ppomiarowego napięcia zasilania bateryjnego*/
-	if(me->timerMeasureBatteryVoltage>=CAR_TIME_TO_SEND_BATTERY_VOLTAGE){
+	if(me->timeToMeasureBatteryVoltage>=CAR_TIME_TO_SEND_BATTERY_VOLTAGE){
 		me->batteryVoltage->startMeasurment(me->batteryVoltage);
-		me->timerMeasureBatteryVoltage=0;
+		me->timeToMeasureBatteryVoltage=0;
 	}
 
 	uint32_t *pointerToValueFromAdc=me->batteryVoltage->getValue(me->batteryVoltage);
@@ -448,7 +448,7 @@ void Car_mainFun(carModule *me){
 	}
 					/*Obsługa modułu sensora IR*/
 	me->irSensor->readStatus(me->irSensor);
-	if(me->timerToSendIrSensorStatus>=CAR_TIME_TO_SEND_STATUS_IRSENSOR){
+	if(me->timeToSendIrSensorStatus>=CAR_TIME_TO_SEND_STATUS_IRSENSOR){
 		uint32_t IrSensorValue=me->irSensor->getValue(me->irSensor);
 		me->outMessage->InsertIrSensor(me->outMessage,IrSensorValue);
 		if(me->autoDriveVariable.positionStateMachineControlCar>3){
@@ -456,7 +456,7 @@ void Car_mainFun(carModule *me){
 		}else{
 			me->outMessage->SendDriveStatus(me->outMessage,1);
 		}
-		me->timerToSendIrSensorStatus=0;
+		me->timeToSendIrSensorStatus=0;
 
 	}
 					/*Obsługa main z modułu kontrolujace pomiar odleglości */
@@ -1148,8 +1148,8 @@ int __io_putchar(int ch)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
 	if(htim==CarTestModule->timer1ms){
 		CarTestModule->timeToResetMotorControl++;
-		CarTestModule->timerMeasureBatteryVoltage++;
-		CarTestModule->timerToSendIrSensorStatus++;
+		CarTestModule->timeToMeasureBatteryVoltage++;
+		CarTestModule->timeToSendIrSensorStatus++;
 		CarTestModule->inMessage->AddTimeout(CarTestModule->inMessage);
 		CarTestModule->batteryVoltage->addTime(CarTestModule->batteryVoltage);
 		CarTestModule->rangeMeasurmentControl->timeInterrupt(CarTestModule->rangeMeasurmentControl);

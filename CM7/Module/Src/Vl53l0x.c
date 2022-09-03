@@ -339,6 +339,10 @@ uint8_t vl53l0x_SensorInit(StructVl53l0x *me){
 
 		  // VL53L0X_PerformRefCalibration() end
 		  me->status=vl53l0x_Idle;
+
+		  //TODO wywalić pózniej
+		  //vl53l0x_LongRange(me);
+		  //vl53l0x_HighAccuracy(me);
 		  return 1;
 }
 
@@ -964,4 +968,27 @@ uint8_t vl53l0x_IsReady(StructVl53l0x* me){
 	}else{
 		return RESET;
 	}
+}
+void vl53l0x_DefaultMode(StructVl53l0x* me){
+	/*VL53L0X_SetLimitCheckEnable(Dev,VL53L0X_CHECKENABLE_SIGNAL_REF_CLIP, 0);
+	VL53L0X_SetLimitCheckEnable(Dev,VL53L0X_CHECKENABLE_RANGE_IGNORE_THRESHOLD, 0);
+	VL53L0X_SetLimitCheckEnable(Dev,VL53L0X_CHECKENABLE_SIGNAL_RATE_MSRC, 0);
+	VL53L0X_SetLimitCheckEnable(Dev,VL53L0X_CHECKENABLE_SIGNAL_RATE_PRE_RANGE, 0);
+	VL53L0X_SetLimitCheckValue(Dev,VL53L0X_CHECKENABLE_SIGMA_FINAL_RANGE,(FixPoint1616_t)(18 * 65536));
+	VL53L0X_SetLimitCheckValue(Dev,VL53L0X_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE,(FixPoint1616_t)(25 * 65536 / 100));
+	VL53L0X_SetLimitCheckValue(Dev,VL53L0X_CHECKENABLE_SIGNAL_REF_CLIP,(FixPoint1616_t)(35 * 65536));
+	VL53L0X_SetLimitCheckValue(Dev,VL53L0X_CHECKENABLE_RANGE_IGNORE_THRESHOLD,(FixPoint1616_t)(0 * 65536));*/
+}
+void vl53l0x_HighAccuracy(StructVl53l0x* me){
+	vl53l0x_SetMeasurementTimingBudget(me,200000);
+}
+void vl53l0x_LongRange(StructVl53l0x* me){
+	// lower the return signal rate limit (default is 0.25 MCPS)
+	vl53l0x_SetSignalRateLimit(me,0.1);
+	  // increase laser pulse periods (defaults are 14 and 10 PCLKs)
+	vl53l0x_SetVcselPulsePeriod(me,VcselPeriodPreRange,18);
+	vl53l0x_SetVcselPulsePeriod(me,VcselPeriodFinalRange, 14);
+}
+void vl53l0x_HighSpeed(StructVl53l0x* me){
+	vl53l0x_SetMeasurementTimingBudget(me,20000);
 }

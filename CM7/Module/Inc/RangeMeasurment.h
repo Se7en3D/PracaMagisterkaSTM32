@@ -38,7 +38,7 @@ struct rangeMeasurmentStruct{
 	StructVl53l0x *vl53l0x;
 		//Funkcje
 	void (*createHcSr04)(rangeMeasurmentStruct* me,TIM_HandleTypeDef* timerHcSr04);
-	void (*createVl54l0x)(rangeMeasurmentStruct *me,I2C_HandleTypeDef * hi2cVl53l0,GPIO_TypeDef *xshutgpio,uint16_t xshutpin);
+	void (*createVl53l0x)(rangeMeasurmentStruct *me,I2C_HandleTypeDef * hi2cVl53l0,GPIO_TypeDef *xshutgpio,uint16_t xshutpin);
 	void (*createServoPR)(rangeMeasurmentStruct *me,TIM_HandleTypeDef *PWMtimerGen,uint32_t TimChannel);
 	uint8_t (*rangeMeasurment)(rangeMeasurmentStruct *me,uint8_t position);
 	uint16_t* (*getVl53l0xDistance)(rangeMeasurmentStruct *me);

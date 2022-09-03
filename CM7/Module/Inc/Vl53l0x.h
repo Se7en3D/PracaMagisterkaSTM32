@@ -237,4 +237,8 @@ uint16_t* vl53l0x_FunctionWaitingForTheInterruptFlagToBeSet(StructVl53l0x* me);
 uint16_t* vl53l0x_FunctionTimeout(StructVl53l0x* me);
 void vl53l0x_StartSingleMeasurment(StructVl53l0x* me);
 uint8_t vl53l0x_IsReady(StructVl53l0x* me);
+void vl53l0x_DefaultMode(StructVl53l0x* me);
+void vl53l0x_HighAccuracy(StructVl53l0x* me);
+void vl53l0x_LongRange(StructVl53l0x* me);
+void vl53l0x_HighSpeed(StructVl53l0x* me);
 #endif /* INC_VL53L0X_H_ */

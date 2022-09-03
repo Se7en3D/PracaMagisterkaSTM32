@@ -56,7 +56,7 @@ void RangeMeasurment_Init(rangeMeasurmentStruct* me,
 						void (*main)(rangeMeasurmentStruct *me),
 						uint8_t (*isRangeMeasurmentEnd)(rangeMeasurmentStruct *me)){
 	me->createHcSr04=createHcSr04;
-	me->createVl54l0x=createVl54l0x;
+	me->createVl53l0x=createVl54l0x;
 	me->createServoPR=createServoPR;
 	me->rangeMeasurment=rangeMeasurment;
 	me->getVl53l0xDistance=getVl53l0xDistance;
